@@ -1,0 +1,15 @@
+id: b_bigger_arena
+category: balance
+prompt: 'Make the platform 50% bigger, and keep the 1v1 fair afterwards: each side should win 35-65% of fights.'
+start: start.yaml
+allowed_changes: [game.platform, characters]
+checks:
+- {kind: spec, path: game.platform.radius, op: ==, value: 18}
+- kind: sim
+  seeds: 20
+  policy: auto
+  assert:
+  - rate:
+      outcome: [red]
+    min: 0.35
+    max: 0.65

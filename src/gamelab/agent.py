@@ -15,13 +15,12 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from . import bench, dsl
-from .engine import simulate, with_seed
+from . import engines
 
 ROOT = Path(__file__).resolve().parents[2]
-DSL_DOC = (ROOT / "docs" / "DSL.md").read_text()
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
-SYSTEM = f"""You modify games written in the GameLab DSL. The game is a single file, game.yaml.
+SYSTEM_HEAD = """You modify games written in the GameLab DSL. The game is a single file, game.yaml.
 A designer asks for a change; make exactly that change by editing game.yaml with your tools.
 
 Rules:
@@ -29,7 +28,11 @@ Rules:
 - The file must stay valid DSL.
 - When you are done, reply with one or two sentences saying what you changed, and make no further tool calls.
 
-{DSL_DOC}"""
+"""
+
+
+def system_for(src: str) -> str:
+    return SYSTEM_HEAD + engines.doc_for(engines.kind_of(src))
 
 
 def _schema(props, required):
@@ -80,7 +83,7 @@ class Workspace:
 
     def _wrote(self):
         self.writes += 1
-        if not dsl.validate(self.src).ok:
+        if not engines.validate(self.src).ok:
             self.invalid_writes += 1
 
     def call(self, name, args):
@@ -98,13 +101,13 @@ class Workspace:
             self._wrote()
             return "edit applied"
         if name == "validate_game":
-            return dsl.validate(self.src).text()
+            return engines.validate(self.src).text()
         if name == "simulate_game":
-            rep = dsl.validate(self.src)
+            rep = engines.validate(self.src)
             if not rep.ok:
                 return "cannot simulate, the game is invalid:\n" + rep.text()
             spec, n = rep.spec, args.get("seeds") or 5
-            runs = [simulate(with_seed(spec, i), record_frames=False) for i in range(n)]
+            runs = [engines.run(spec, i) for i in range(n)]
             out = {"outcomes": [r.outcome for r in runs], "fight_seconds": [round(r.time, 1) for r in runs], "seed1_summary": runs[0].summary()}
             if args.get("event_types"):
                 out["seed1_events"] = [e for e in runs[0].events if e["type"] in set(args["event_types"])][:60]
@@ -166,7 +169,7 @@ def run_task(task, arm, model, effort, max_turns=30, client=None) -> tuple[RunRe
             while res.turns < max_turns:
                 resp = client.beta.messages.create(
                     model=model, max_tokens=16000,
-                    system=[{"type": "text", "text": SYSTEM, "cache_control": {"type": "ephemeral"}}],
+                    system=[{"type": "text", "text": system_for(task["_start_src"]), "cache_control": {"type": "ephemeral"}}],
                     tools=tools, messages=messages,
                     output_config={"effort": effort},
                     betas=[FALLBACK_BETA], extra_body={"fallbacks": "default"},
@@ -247,7 +250,7 @@ def run_task_cc(task, arm, model, effort, root, budget_usd=2.0):
         allowed += ["Bash(./validate)", "Bash(./simulate:*)", "Bash(./simulate)"]
     cmd = ["claude", "-p", f"Request from the designer:\n\n{task['prompt']}",
            "--output-format", "json", "--model", model, "--effort", effort,
-           "--system-prompt", CC_SYSTEM[arm] + "\n" + DSL_DOC,
+           "--system-prompt", CC_SYSTEM[arm] + "\n" + engines.doc_for(engines.kind_of(task["_start_src"])),
            "--tools", tools, "--allowedTools", ",".join(allowed),
            "--restricted", "--strict-mcp-config", "--disable-slash-commands", "--no-session-persistence",
            "--max-budget-usd", str(budget_usd)]

@@ -1,0 +1,23 @@
+id: b_wrestler_rocks
+category: ability
+prompt: 'Replace the wrestler''s earthquake with a rock summon on a+b: 4 rocks that orbit him for 5 seconds, each doing 6 damage and 8 knockback.'
+start: start.yaml
+allowed_changes: ['characters[wrestler].abilities']
+checks:
+- {kind: spec, path: 'characters[wrestler].abilities[earthquake]', op: missing}
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: rocks
+    where: {src: red_wrestler, count: 4}
+    min: 1
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - value: hit
+    where: {src: red_wrestler}
+    field: damage
+    agg: max
+    min: 6

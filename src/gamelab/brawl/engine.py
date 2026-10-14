@@ -31,6 +31,7 @@ class Unit:
     alive: bool = True
     air_until: float = -1.0
     jump_ab: object = None
+    in_air: bool = False
     stun_until: float = -1.0
     facing: tuple[float, float] = (1.0, 0.0)
     ready_at: dict = field(default_factory=dict)
@@ -218,6 +219,7 @@ class Sim:
         elif ab.kind == "jump":
             u.air_until = self.t + ab.duration
             u.jump_ab = ab
+            u.in_air = True
             self.emit("jump", src=u.name, ability=ab.name)
         elif ab.kind == "wall":
             c = (u.x + d[0] * ab.distance, u.y + d[1] * ab.distance)
@@ -374,9 +376,9 @@ class Sim:
 
     def step(self):
         for u in [u for u in self.units if u.alive]:
-            was_air = self.airborne(u)
             self.step_unit(u)
-            if was_air and not self.airborne(u):
+            if u.in_air and not self.airborne(u):
+                u.in_air = False
                 ab = u.jump_ab
                 self.emit("land", src=u.name)
                 if ab and ab.landing_radius > 0:

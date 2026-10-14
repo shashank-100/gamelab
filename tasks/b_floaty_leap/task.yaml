@@ -1,0 +1,8 @@
+id: b_floaty_leap
+category: feel
+prompt: Make the ninja's leap last twice as long, and let her move faster while she's in the air.
+start: start.yaml
+allowed_changes: ['characters[ninja].abilities[leap]']
+checks:
+- {kind: spec, path: 'characters[ninja].abilities[leap].duration', op: ==, value: 1.4}
+- {kind: spec, path: 'characters[ninja].abilities[leap].air_speed', op: '>', value: 1.5}

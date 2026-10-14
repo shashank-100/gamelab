@@ -1,0 +1,14 @@
+id: b_balance_3v3
+category: balance
+prompt: Three ninjas crush the mixed red team in 3v3. Make it fair (red wins 35-65%) by changing only the ninja.
+start: start.yaml
+allowed_changes: ['characters[ninja]']
+checks:
+- kind: sim
+  seeds: 20
+  policy: auto
+  assert:
+  - rate:
+      outcome: [red]
+    min: 0.35
+    max: 0.65

@@ -1,0 +1,8 @@
+id: b_fix_button_clash
+category: bugfix
+prompt: The game won't load since the last edit. Fix it. Leap is supposed to be the ninja's a+b move.
+start: start.yaml
+allowed_changes: ['characters[ninja].abilities[leap]']
+checks:
+- {kind: spec, path: 'characters[ninja].abilities[leap].button', op: ==, value: a+b}
+- {kind: spec, path: 'characters[ninja].abilities[shuriken].button', op: ==, value: a}

@@ -1,0 +1,14 @@
+id: b_balance_ninja_op
+category: balance
+prompt: The ninja is overpowered in 1v1. Bring the matchup back so each side wins 35-65% of fights. Only change the ninja.
+start: start.yaml
+allowed_changes: ['characters[ninja]']
+checks:
+- kind: sim
+  seeds: 20
+  policy: auto
+  assert:
+  - rate:
+      outcome: [red]
+    min: 0.35
+    max: 0.65

@@ -1,0 +1,23 @@
+id: b_new_earthbender
+category: content
+prompt: 'Add a new character, `earthbender`, and have it fight the ninja instead of the wrestler (put it on red). Earthbender: weight 1.5, speed
+  3.2, radius 0.7. On a: `stone_orbit`, 4 orbiting rocks for 5s, knockback 8, 6s cooldown. On b: `boulder`, a projectile with knockback 9, speed
+  12, range 10, radius 0.6, 1.4s cooldown. On a+b: `quake_leap`, a 0.8s jump with a landing shockwave (radius 2.5, damage 6, knockback 10), 5s
+  cooldown. You choose the rock and boulder damage: pick values so earthbender wins between 30% and 70% of fights against the ninja.'
+start: start.yaml
+allowed_changes: [characters, teams.red]
+checks:
+- {kind: spec, path: 'characters[earthbender].weight', op: ==, value: 1.5}
+- {kind: spec, path: 'characters[earthbender].abilities[boulder].knockback', op: ==, value: 9}
+- {kind: spec, path: 'characters[earthbender].abilities[stone_orbit].count', op: ==, value: 4}
+- {kind: spec, path: 'characters[earthbender].abilities[quake_leap].landing_knockback', op: ==, value: 10}
+- {kind: spec, path: 'teams.red[0].character', op: ==, value: earthbender}
+- {kind: spec, path: 'characters[wrestler].weight', op: ==, value: 2.0}
+- kind: sim
+  seeds: 20
+  policy: auto
+  assert:
+  - rate:
+      outcome: [red]
+    min: 0.3
+    max: 0.7

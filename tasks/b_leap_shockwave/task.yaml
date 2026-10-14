@@ -1,0 +1,17 @@
+id: b_leap_shockwave
+category: ability
+prompt: 'Give the ninja''s leap a landing shockwave: radius 2.5, 5 damage, 9 knockback.'
+start: start.yaml
+allowed_changes: ['characters[ninja].abilities[leap]']
+checks:
+- {kind: spec, path: 'characters[ninja].abilities[leap].landing_radius', op: ==, value: 2.5}
+- {kind: spec, path: 'characters[ninja].abilities[leap].duration', op: ==, value: 0.7}
+- kind: sim
+  seeds: 20
+  policy: auto
+  assert:
+  - rate:
+      count: hit
+      where: {src: blue_ninja, ability: leap}
+      min: 1
+    min: 0.2

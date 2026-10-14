@@ -1,0 +1,17 @@
+id: b_fix_fizzle
+category: bugfix
+prompt: Players say the wrestler's earthquake never does anything. Fix it without changing its damage or knockback.
+start: start.yaml
+allowed_changes: ['characters[wrestler].abilities[earthquake]']
+checks:
+- {kind: spec, path: 'characters[wrestler].abilities[earthquake].damage_max', op: ==, value: 20}
+- {kind: spec, path: 'characters[wrestler].abilities[earthquake].knockback_max', op: ==, value: 22}
+- kind: sim
+  seeds: 10
+  policy: auto
+  assert:
+  - rate:
+      count: channel_release
+      where: {src: red_wrestler}
+      min: 1
+    min: 0.5

@@ -271,15 +271,16 @@ task("balance_swarm_challenge", "balance", "swarm",
      _goblins)
 
 
-def write():
+def write(tasks=None, base=None):
+    tasks, base = tasks or TASKS, base or BASE
     out = ROOT / "tasks"
-    if out.exists():
-        shutil.rmtree(out)
     ok = True
-    for t in TASKS:
+    for t in tasks:
         d = out / t["id"]
+        if d.exists():
+            shutil.rmtree(d)
         d.mkdir(parents=True)
-        start = copy.deepcopy(BASE[t["base"]])
+        start = copy.deepcopy(base[t["base"]])
         if t["start"]:
             t["start"](start)
         sol = copy.deepcopy(start)
@@ -296,7 +297,7 @@ def write():
         print(f"{'ok ' if good else 'BAD'} {t['id']:28s} start={'pass' if v_start.passed else 'fail'} solution={'pass' if v_sol.passed else 'fail'}")
         if not good:
             print(v_sol.text() if not v_sol.passed else v_start.text())
-    print(f"{len(TASKS)} tasks, all verified" if ok else "SOME TASKS BROKEN")
+    print(f"{len(tasks)} tasks, all verified" if ok else "SOME TASKS BROKEN")
     return ok
 
 

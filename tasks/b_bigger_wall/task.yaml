@@ -1,0 +1,17 @@
+id: b_bigger_wall
+category: ability
+prompt: The ninja spams shuriken. Make the wrestler's wall at least 7 units long and last 5 seconds so it blocks more of them.
+start: start.yaml
+allowed_changes: ['characters[wrestler].abilities[rock_wall]']
+checks:
+- {kind: spec, path: 'characters[wrestler].abilities[rock_wall].length', op: '>=', value: 7}
+- {kind: spec, path: 'characters[wrestler].abilities[rock_wall].duration', op: ==, value: 5}
+- kind: sim
+  seeds: 10
+  policy: auto
+  assert:
+  - rate:
+      count: blocked
+      where: {by: wall}
+      min: 1
+    min: 0.5

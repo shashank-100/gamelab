@@ -1,0 +1,15 @@
+id: b_make_3v3
+category: content
+prompt: 'Make this a 3v3: red is two wrestlers and a ninja, blue is three ninjas.'
+start: start.yaml
+allowed_changes: [teams]
+checks:
+- {kind: spec, path: 'teams.red[0].character', op: ==, value: wrestler}
+- {kind: spec, path: 'teams.red[1].character', op: ==, value: wrestler}
+- {kind: spec, path: 'teams.red[2].character', op: ==, value: ninja}
+- {kind: spec, path: 'teams.blue[2].character', op: ==, value: ninja}
+- kind: sim
+  seeds: 2
+  policy: auto
+  assert:
+  - {count: spawn, min: 6, max: 6}

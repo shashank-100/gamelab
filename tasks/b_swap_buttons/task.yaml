@@ -1,0 +1,9 @@
+id: b_swap_buttons
+category: ability
+prompt: 'Swap the wrestler''s controls: earthquake goes on a, grapple slam goes on a+b.'
+start: start.yaml
+allowed_changes: ['characters[wrestler].abilities']
+checks:
+- {kind: spec, path: 'characters[wrestler].abilities[earthquake].button', op: ==, value: a}
+- {kind: spec, path: 'characters[wrestler].abilities[grapple_slam].button', op: ==, value: a+b}
+- {kind: spec, path: 'characters[wrestler].abilities[rock_wall].button', op: ==, value: b}

@@ -1,0 +1,14 @@
+id: b_balance_wrestler_op
+category: balance
+prompt: The wrestler wins way too often in 1v1. Rebalance it so each side wins between 35% and 65% of fights, only touching the wrestler's abilities.
+start: start.yaml
+allowed_changes: ['characters[wrestler].abilities']
+checks:
+- kind: sim
+  seeds: 20
+  policy: auto
+  assert:
+  - rate:
+      outcome: [red]
+    min: 0.35
+    max: 0.65

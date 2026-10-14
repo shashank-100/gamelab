@@ -1,0 +1,17 @@
+id: b_heavier_wrestler
+category: feel
+prompt: The wrestler should feel twice as heavy and a little slower, but he still needs to win at least 35% of 1v1s against the ninja.
+start: start.yaml
+allowed_changes: ['characters[wrestler].weight', 'characters[wrestler].speed']
+checks:
+- {kind: spec, path: 'characters[wrestler].weight', op: ==, value: 4.0}
+- {kind: spec, path: 'characters[wrestler].speed', op: <, value: 3.5}
+- {kind: spec, path: 'characters[wrestler].speed', op: '>=', value: 2.5}
+- kind: sim
+  seeds: 20
+  policy: auto
+  assert:
+  - rate:
+      outcome: [red]
+    min: 0.35
+    max: 1.0

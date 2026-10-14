@@ -1,0 +1,17 @@
+id: b_faster_fights
+category: balance
+prompt: 'Fights drag on. At least 60% of 1v1s should be over in under 33 seconds, and the matchup must stay fair: each side wins 30-70%.'
+start: start.yaml
+allowed_changes: [game, characters]
+checks:
+- kind: sim
+  seeds: 20
+  policy: auto
+  assert:
+  - rate:
+      time: {max: 33}
+    min: 0.6
+  - rate:
+      outcome: [red]
+    min: 0.3
+    max: 0.7

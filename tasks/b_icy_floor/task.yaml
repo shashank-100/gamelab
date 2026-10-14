@@ -1,0 +1,8 @@
+id: b_icy_floor
+category: feel
+prompt: 'Make the floor feel icy: fighters who get hit should slide much farther than they do now.'
+start: start.yaml
+allowed_changes: [game.friction]
+checks:
+- {kind: spec, path: game.friction, op: <=, value: 2.5}
+- {kind: spec, path: game.friction, op: '>', value: 0}

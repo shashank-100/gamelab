@@ -1,0 +1,29 @@
+game:
+  name: pro_bending
+  platform: {radius: 12}
+  tick_rate: 30
+  max_seconds: 90
+  seed: 1
+characters:
+- name: wrestler
+  weight: 2.0
+  speed: 3.5
+  radius: 0.9
+  abilities:
+  - {name: grapple_slam, kind: strike, button: a, cooldown: 0.9, damage: 9, knockback: 7, range: 1.4, windup: 0.15}
+  - {name: rock_wall, kind: wall, button: b, cooldown: 6, length: 5, duration: 3}
+  - {name: earthquake, kind: channel, button: a+b, cooldown: 7, min_time: 0.3, max_time: 2.0, rooted: true, interruptible: true, release: shockwave,
+    radius: 4, damage_min: 5, damage_max: 20, knockback_min: 6, knockback_max: 22}
+- name: ninja
+  weight: 0.8
+  speed: 6
+  radius: 0.5
+  abilities:
+  - {name: shuriken, kind: projectile, button: a, cooldown: 0.5, damage: 4, knockback: 3, speed: 22, range: 11}
+  - {name: shadow_step, kind: dash, button: b, cooldown: 2.5, distance: 5, damage: 6, knockback: 11}
+  - {name: leap, kind: jump, button: a, cooldown: 4, duration: 0.7, air_speed: 1.5}
+teams:
+  red:
+  - {character: wrestler}
+  blue:
+  - {character: ninja}

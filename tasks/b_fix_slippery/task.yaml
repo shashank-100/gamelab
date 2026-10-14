@@ -1,0 +1,13 @@
+id: b_fix_slippery
+category: bugfix
+prompt: Since the last patch, fights end in a few seconds and tiny hits fling people off the map. Fix it.
+start: start.yaml
+allowed_changes: [game]
+checks:
+- kind: sim
+  seeds: 10
+  policy: auto
+  assert:
+  - rate:
+      time: {min: 15}
+    min: 0.8

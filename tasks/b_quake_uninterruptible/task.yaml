@@ -1,0 +1,18 @@
+id: b_quake_uninterruptible
+category: ability
+prompt: Earthquake gets interrupted too easily. Make it impossible to interrupt, but halve its maximum knockback to compensate.
+start: start.yaml
+allowed_changes: ['characters[wrestler].abilities[earthquake]']
+checks:
+- {kind: spec, path: 'characters[wrestler].abilities[earthquake].knockback_max', op: ==, value: 11}
+- {kind: spec, path: 'characters[wrestler].abilities[earthquake].knockback_min', op: ==, value: 6}
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: channel_interrupt
+    where: {src: red_wrestler}
+    max: 0
+  - count: channel_start
+    where: {src: red_wrestler}
+    min: 1

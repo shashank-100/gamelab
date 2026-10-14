@@ -4,7 +4,7 @@ import json
 import sys
 
 from . import dsl
-from .engine import simulate, with_seed
+from . import engines
 
 
 def main(argv=None):
@@ -26,7 +26,7 @@ def main(argv=None):
     a = p.parse_args(argv)
 
     src = open(a.file).read()
-    rep = dsl.validate(src)
+    rep = engines.validate(src)
     if a.cmd == "validate" or not rep.ok:
         print(rep.text())
         return 0 if rep.ok else 1
@@ -43,7 +43,7 @@ def main(argv=None):
     if a.cmd == "sim":
         outs = []
         for i in range(a.seeds):
-            res = simulate(with_seed(spec, i), record_frames=bool(a.trace))
+            res = engines.run(spec, i, record_frames=bool(a.trace))
             outs.append(res.outcome)
             if a.seeds == 1:
                 print(json.dumps(res.summary(), indent=2))
