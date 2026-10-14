@@ -1,0 +1,14 @@
+id: fix_summon_flood
+category: bugfix
+prompt: Once the boss is hurt it summons an endless flood of bats. It should summon 3 bats one time only.
+start: start.yaml
+allowed_changes: ['enemies[boss].behavior']
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: summon
+    where: {src: boss}
+    min: 3
+    max: 3

@@ -1,0 +1,23 @@
+[project]
+name = "gamelab"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "shashank-100", email = "shashank.telkhade@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=2.8.0",
+    "pydantic>=2.14.3",
+    "pygame-ce>=2.5.8",
+    "pyyaml>=6.0.3",
+]
+
+[project.scripts]
+gamelab = "gamelab.cli:main"
+gamelab-agent = "gamelab.agent:main"
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"

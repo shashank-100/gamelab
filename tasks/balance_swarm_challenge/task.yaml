@@ -1,0 +1,15 @@
+id: balance_swarm_challenge
+category: balance
+prompt: The goblins are too weak. Make the fight last at least 15 seconds and make the mage take at least 41 damage, but the mage must still win
+  every time. Only change the goblins.
+start: start.yaml
+allowed_changes: [enemies]
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - time: {min: 15}
+  - outcome: [win]
+  - damage: {dst: mage}
+    min_total: 41

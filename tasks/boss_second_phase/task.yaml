@@ -1,0 +1,23 @@
+id: boss_second_phase
+category: behavior
+prompt: 'Give the boss a second phase: the first time it drops below 40% health it heals 100 health and becomes enraged, dealing double damage.
+  The warrior should still be able to win, so give the warrior more health if needed (only health).'
+start: start.yaml
+allowed_changes: ['enemies[boss].behavior', 'characters[warrior].health']
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: heal
+    where: {src: boss}
+    min: 1
+    max: 1
+  - hp_pct: heal
+    where: {src: boss}
+    max: 40
+  - count: enrage
+    where: {src: boss}
+    min: 1
+    max: 1
+  - outcome: [win]

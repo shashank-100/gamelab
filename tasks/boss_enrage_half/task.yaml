@@ -1,0 +1,18 @@
+id: boss_enrage_half
+category: behavior
+prompt: Once the boss falls below half health it should become enraged and hit 50% harder for the rest of the fight. This happens only once.
+start: start.yaml
+allowed_changes: ['enemies[boss].behavior']
+checks:
+- {kind: spec, path: 'enemies[boss].behavior[0].amount', op: ==, value: 1.5}
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: enrage
+    where: {src: boss}
+    min: 1
+    max: 1
+  - hp_pct: enrage
+    where: {src: boss}
+    max: 50

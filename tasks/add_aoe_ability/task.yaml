@@ -1,0 +1,14 @@
+id: add_aoe_ability
+category: content
+prompt: Give the mage a `ground_slam` that deals 20 damage to every enemy within 4 units, with a 5 second cooldown.
+start: start.yaml
+allowed_changes: ['characters[mage].abilities']
+checks:
+- {kind: spec, path: 'characters[mage].abilities[ground_slam].radius', op: ==, value: 4}
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - damage: {src: mage, ability: ground_slam}
+    each: 20
+  - outcome: [win]

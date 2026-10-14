@@ -1,0 +1,19 @@
+id: boss_teleport_low_hp
+category: behavior
+prompt: When the boss drops below 30% health it should teleport to a random spot, at most once every 5 seconds.
+start: start.yaml
+allowed_changes: ['enemies[boss].behavior']
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: teleport
+    where: {src: boss}
+    min: 1
+  - hp_pct: teleport
+    where: {src: boss}
+    max: 30
+  - gap: teleport
+    where: {src: boss}
+    min: 5

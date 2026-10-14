@@ -1,0 +1,10 @@
+id: rename_ability
+category: content
+prompt: Rename the warrior's `slash` ability to `cleave`. Nothing else about it should change.
+start: start.yaml
+allowed_changes: ['characters[warrior].abilities[slash]', 'characters[warrior].abilities[cleave]']
+checks:
+- {kind: spec, path: 'characters[warrior].abilities[slash]', op: missing}
+- {kind: spec, path: 'characters[warrior].abilities[cleave].damage', op: ==, value: 12}
+- {kind: spec, path: 'characters[warrior].abilities[cleave].cooldown', op: ==, value: 0.8}
+- {kind: spec, path: 'characters[warrior].abilities[cleave].type', op: ==, value: melee}

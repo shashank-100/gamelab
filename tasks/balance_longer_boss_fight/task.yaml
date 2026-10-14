@@ -1,0 +1,13 @@
+id: balance_longer_boss_fight
+category: balance
+prompt: The boss fight is over too fast. Make it last between 40 and 90 seconds with the auto player, and the warrior must still win every time.
+  Only change the boss.
+start: start.yaml
+allowed_changes: ['enemies[boss]']
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - time: {min: 40, max: 90}
+  - outcome: [win]

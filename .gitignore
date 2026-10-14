@@ -1,0 +1,7 @@
+foundation/
+gamedevbench/
+shots/
+__pycache__/
+.venv/
+.env
+results/

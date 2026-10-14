@@ -1,0 +1,13 @@
+id: faster_warrior
+category: tune
+prompt: The warrior feels sluggish. Make it move 50% faster and dash 50% farther.
+start: start.yaml
+allowed_changes: ['characters[warrior].speed', 'characters[warrior].abilities[dash].distance']
+checks:
+- {kind: spec, path: 'characters[warrior].speed', op: ==, value: 7.5}
+- {kind: spec, path: 'characters[warrior].abilities[dash].distance', op: ==, value: 15}
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - outcome: [win]

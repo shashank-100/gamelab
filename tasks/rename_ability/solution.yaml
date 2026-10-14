@@ -1,0 +1,22 @@
+game:
+  name: arena
+  arena: {width: 40, height: 30}
+  gravity: 0
+  tick_rate: 20
+  max_seconds: 120
+  seed: 1
+characters:
+- name: warrior
+  health: 100
+  speed: 5
+  spawn: [5, 15]
+  abilities:
+  - {name: dash, type: dash, cooldown: 3, distance: 10}
+  - {name: fireball, type: projectile, cooldown: 1.5, damage: 25, range: 15, projectile_speed: 18}
+  - {name: cleave, type: melee, cooldown: 0.8, damage: 12, range: 1.5}
+enemies:
+- name: boss
+  health: 500
+  speed: 3
+  spawn: [34, 15]
+  attack: {damage: 9, range: 1.5, cooldown: 1}

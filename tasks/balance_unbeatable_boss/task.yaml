@@ -1,0 +1,11 @@
+id: balance_unbeatable_boss
+category: balance
+prompt: Make the boss strong enough that the auto player loses every time, by changing only the boss's attack and speed.
+start: start.yaml
+allowed_changes: ['enemies[boss].attack', 'enemies[boss].speed']
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - outcome: [lose]

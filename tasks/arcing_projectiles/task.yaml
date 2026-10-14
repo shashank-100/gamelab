@@ -1,0 +1,7 @@
+id: arcing_projectiles
+category: tune
+prompt: Turn on gravity of 9.8 so projectiles arc downward.
+start: start.yaml
+allowed_changes: [game.gravity]
+checks:
+- {kind: spec, path: game.gravity, op: ==, value: 9.8}

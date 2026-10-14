@@ -1,0 +1,13 @@
+id: tune_fireball_damage
+category: tune
+prompt: Make the warrior's fireball deal 40 damage per hit.
+start: start.yaml
+allowed_changes: ['characters[warrior].abilities[fireball].damage']
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - damage: {src: warrior, ability: fireball}
+    each: 40
+  - outcome: [win]

@@ -1,0 +1,18 @@
+id: fix_teleport_threshold
+category: bugfix
+prompt: The boss is supposed to teleport (at most every 5s) once it is below 30% health, but it basically never does. Fix it.
+start: start.yaml
+allowed_changes: ['enemies[boss].behavior']
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: teleport
+    where: {src: boss}
+    min: 1
+  - hp_pct: teleport
+    where: {src: boss}
+    first: true
+    min: 20
+    max: 30

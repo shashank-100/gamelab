@@ -1,0 +1,16 @@
+id: boss_flees_when_low
+category: behavior
+prompt: Under 20% health the boss should run away from the player instead of chasing.
+start: start.yaml
+allowed_changes: ['enemies[boss].behavior']
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: mode
+    where: {src: boss, mode: flee}
+    min: 1
+  - hp_pct: mode
+    where: {src: boss, mode: flee}
+    max: 20

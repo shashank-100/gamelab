@@ -1,0 +1,15 @@
+id: add_ally
+category: content
+prompt: 'Add an ally character `cleric` with 80 health and speed 4 that fights alongside the warrior using a projectile `smite`: 10 damage, range
+  12, 1.2s cooldown.'
+start: start.yaml
+allowed_changes: ['characters[cleric]']
+checks:
+- {kind: spec, path: 'characters[cleric].health', op: ==, value: 80}
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - damage: {src: cleric, ability: smite}
+    each: 10
+  - outcome: [win]

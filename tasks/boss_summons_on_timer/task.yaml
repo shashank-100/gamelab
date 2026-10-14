@@ -1,0 +1,17 @@
+id: boss_summons_on_timer
+category: behavior
+prompt: Starting 10 seconds into the fight, the boss summons one imp every 10 seconds. Imps have 20 health, speed 6 and a 3 damage melee attack.
+start: start.yaml
+allowed_changes: [enemies]
+checks:
+- {kind: spec, path: 'enemies[imp].health', op: ==, value: 20}
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: summon
+    where: {src: boss}
+    min: 1
+  - gap: summon
+    where: {src: boss}
+    min: 10

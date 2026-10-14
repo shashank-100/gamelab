@@ -1,0 +1,17 @@
+id: fix_rule_order
+category: bugfix
+prompt: The boss should flee below 25% health but it keeps chasing. Fix the behavior without removing either rule.
+start: start.yaml
+allowed_changes: ['enemies[boss].behavior']
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: mode
+    where: {src: boss, mode: flee}
+    min: 1
+  - hp_pct: mode
+    where: {src: boss, mode: flee}
+    max: 25
+- {kind: spec, path: 'enemies[boss].behavior[1]', op: exists}

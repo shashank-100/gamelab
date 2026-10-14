@@ -1,0 +1,20 @@
+id: boss_summons_skeletons
+category: behavior
+prompt: Below 50% health the boss should summon 2 skeletons, one time only. Skeletons have 40 health, speed 4, and a melee attack doing 5 damage.
+start: start.yaml
+allowed_changes: [enemies]
+checks:
+- {kind: spec, path: 'enemies[skeleton].health', op: ==, value: 40}
+- {kind: spec, path: 'enemies[skeleton].speed', op: ==, value: 4}
+- {kind: spec, path: 'enemies[skeleton].attack.damage', op: ==, value: 5}
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - count: summon
+    where: {src: boss}
+    min: 2
+    max: 2
+  - hp_pct: summon
+    where: {src: boss}
+    max: 50

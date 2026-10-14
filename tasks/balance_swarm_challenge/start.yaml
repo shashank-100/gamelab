@@ -1,0 +1,46 @@
+game:
+  name: swarm
+  arena: {width: 40, height: 30}
+  tick_rate: 20
+  max_seconds: 120
+  seed: 1
+characters:
+- name: mage
+  health: 120
+  speed: 5
+  spawn: [6, 15]
+  abilities:
+  - {name: blink, type: dash, cooldown: 4, distance: 8}
+  - {name: bolt, type: projectile, cooldown: 0.6, damage: 15, range: 14, projectile_speed: 22}
+  - {name: staff, type: melee, cooldown: 0.7, damage: 8, range: 1.5}
+enemies:
+- name: goblin_a
+  health: 45
+  speed: 5
+  spawn: [30, 5]
+  attack: {damage: 3, range: 1.2, cooldown: 1}
+- name: goblin_b
+  health: 45
+  speed: 5
+  spawn: [33, 10]
+  attack: {damage: 3, range: 1.2, cooldown: 1}
+- name: goblin_c
+  health: 45
+  speed: 5
+  spawn: [35, 15]
+  attack: {damage: 3, range: 1.2, cooldown: 1}
+- name: goblin_d
+  health: 45
+  speed: 5
+  spawn: [33, 20]
+  attack: {damage: 3, range: 1.2, cooldown: 1}
+- name: goblin_e
+  health: 45
+  speed: 5
+  spawn: [30, 25]
+  attack: {damage: 3, range: 1.2, cooldown: 1}
+- name: goblin_f
+  health: 45
+  speed: 5
+  spawn: [37, 15]
+  attack: {damage: 3, range: 1.2, cooldown: 1}

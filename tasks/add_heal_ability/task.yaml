@@ -1,0 +1,14 @@
+id: add_heal_ability
+category: content
+prompt: Give the warrior a new heal ability called `mend` that restores 30 health with a 15 second cooldown.
+start: start.yaml
+allowed_changes: ['characters[warrior].abilities']
+checks:
+- {kind: spec, path: 'characters[warrior].abilities[mend].type', op: ==, value: heal}
+- {kind: spec, path: 'characters[warrior].abilities[mend].amount', op: ==, value: 30}
+- {kind: spec, path: 'characters[warrior].abilities[mend].cooldown', op: ==, value: 15}
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - outcome: [win]

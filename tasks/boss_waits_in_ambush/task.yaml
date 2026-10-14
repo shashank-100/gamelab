@@ -1,0 +1,20 @@
+id: boss_waits_in_ambush
+category: behavior
+prompt: The boss should stand still while the player is more than 12 units away, and chase as usual once the player is within 12 units.
+start: start.yaml
+allowed_changes: ['enemies[boss].behavior']
+checks:
+- kind: sim
+  seeds: 5
+  policy: auto
+  assert:
+  - before: [mode, mode]
+    where: {src: boss}
+    where_a: {mode: idle}
+    where_b: {mode: chase}
+  - count: mode
+    where: {src: boss, mode: idle}
+    min: 1
+  - count: mode
+    where: {src: boss, mode: chase}
+    min: 1
