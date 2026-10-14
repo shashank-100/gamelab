@@ -55,7 +55,10 @@ def main(argv=None):
         if a.seeds > 1:
             print(json.dumps({o: outs.count(o) for o in sorted(set(outs))}))
         return 0
-    from . import render
+    if engines.is_brawl(spec):
+        from .brawl import render
+    else:
+        from . import render
 
     if a.cmd == "shots":
         print(render.run(spec, mode="watch", screenshot_dir=a.out, every=a.every))
