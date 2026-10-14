@@ -18,6 +18,11 @@ dependencies = [
 gamelab = "gamelab.cli:main"
 gamelab-agent = "gamelab.agent:main"
 
+[project.optional-dependencies]
+rl = [
+    "mlx-lm>=0.32.2",
+]
+
 [build-system]
 requires = ["uv_build>=0.12.1,<0.13.0"]
 build-backend = "uv_build"
