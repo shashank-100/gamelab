@@ -4,7 +4,7 @@ import json
 import sys
 
 from . import dsl
-from .engine import simulate
+from .engine import simulate, with_seed
 
 
 def main(argv=None):
@@ -43,8 +43,7 @@ def main(argv=None):
     if a.cmd == "sim":
         outs = []
         for i in range(a.seeds):
-            spec_i = spec.model_copy(update={"game": spec.game.model_copy(update={"seed": spec.game.seed + i})})
-            res = simulate(spec_i, record_frames=bool(a.trace))
+            res = simulate(with_seed(spec, i), record_frames=bool(a.trace))
             outs.append(res.outcome)
             if a.seeds == 1:
                 print(json.dumps(res.summary(), indent=2))

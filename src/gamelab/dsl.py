@@ -109,6 +109,13 @@ class Rule(Strict):
         conditions.parse(v)
         return v
 
+    @model_validator(mode="after")
+    def _movement_rules(self):
+        if self.action in MOVE_ACTIONS and (self.once or self.cooldown):
+            raise ValueError(f"`once` and `cooldown` only apply to instant actions (teleport, enrage, heal, summon); "
+                             f"`{self.action}` is a movement mode that holds while its condition is true")
+        return self
+
 
 class Enemy(Strict):
     name: str = Field(pattern=r"^[a-z][a-z0-9_]*$")

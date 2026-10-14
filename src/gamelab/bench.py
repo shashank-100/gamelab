@@ -18,9 +18,6 @@ Task file (tasks/<id>/task.yaml):
 
 Paths: dotted keys, list items selected by name (`characters[warrior]`) or index (`[0]`).
 """
-import copy
-import fnmatch
-import json
 import operator
 import re
 from dataclasses import dataclass, field
@@ -29,7 +26,7 @@ from pathlib import Path
 import yaml
 
 from . import dsl
-from .engine import simulate
+from .engine import simulate, with_seed
 from .policies import auto_policy, idle_policy
 
 POLICIES = {"auto": auto_policy, "idle": idle_policy}
@@ -90,8 +87,13 @@ def diff(a, b, prefix=""):
     return [] if a == b else [prefix]
 
 
+def _glob(pattern, path):
+    """`*` is the only wildcard; `[name]` selectors are literal (fnmatch would treat them as character classes)."""
+    return re.fullmatch(re.escape(pattern).replace(r"\*", ".*"), path) is not None
+
+
 def _allowed(path, patterns):
-    return any(path == p or path.startswith(p + ".") or path.startswith(p + "[") or fnmatch.fnmatch(path, p) for p in patterns)
+    return any(path == p or path.startswith(p + ".") or path.startswith(p + "[") or ("*" in p and _glob(p, path)) for p in patterns)
 
 
 # -- sim assertions -------------------------------------------------------------
@@ -121,16 +123,17 @@ def _check_run(res, a):
             xs = xs[:1]
         if not xs:
             return False, f"no {a['hp_pct']} {a.get('where', {})} events"
-        ok = all((x <= a.get("max", 1e9)) and (x >= a.get("min", -1)) for x in xs)
-        return ok, f"{a['hp_pct']} fired at hp% {xs}, want in [{a.get('min', 0)}, {a.get('max', 100)}]"
+        lo, hi = a.get("min", 0), a.get("max", 100)
+        return all(lo <= x <= hi for x in xs), f"{a['hp_pct']} fired at hp% {xs}, want in [{lo}, {hi}]"
     if "damage" in a:
         xs = [e["amount"] for e in ev if e["type"] == "damage" and _match(e, a["damage"])]
-        # the killing blow is capped by remaining hp, so only non-lethal hits must match exactly
-        lethal = {(e["t"], e["src"]) for e in ev if e["type"] == "death"}
-        full = [e["amount"] for e in ev if e["type"] == "damage" and _match(e, a["damage"]) and e["hp_after"] > 0]
         if not xs:
             return False, f"no damage events matching {a['damage']}"
         if "each" in a:
+            # a killing blow is capped by the target's remaining hp, so only non-lethal hits show the real per-hit damage
+            full = [e["amount"] for e in ev if e["type"] == "damage" and _match(e, a["damage"]) and e["hp_after"] > 0]
+            if not full:
+                return False, f"every matching hit was lethal (amounts {sorted(set(round(x, 2) for x in xs))}), so per-hit damage {a['each']} can't be confirmed"
             return all(abs(x - a["each"]) < 1e-6 for x in full), f"hits {sorted(set(round(x, 2) for x in full))}, want each {a['each']}"
         tot = sum(xs)
         return a.get("min_total", 0) <= tot <= a.get("max_total", 1e12), f"total {tot:.1f}, want [{a.get('min_total', 0)}, {a.get('max_total', 'inf')}]"
@@ -207,8 +210,7 @@ def evaluate(task, game_src: str) -> Verdict:
             pol = POLICIES[c.get("policy", "auto")]
             runs = []
             for i in range(n):
-                s_i = spec.model_copy(update={"game": spec.game.model_copy(update={"seed": spec.game.seed + i})})
-                runs.append(simulate(s_i, policy=pol, record_frames=False))
+                runs.append(simulate(with_seed(spec, i), policy=pol, record_frames=False))
             for a in c["assert"]:
                 res = [_check_run(r, a) for r in runs]
                 bad = [d for ok, d in res if not ok]

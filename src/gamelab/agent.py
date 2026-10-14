@@ -15,7 +15,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from . import bench, dsl
-from .engine import simulate
+from .engine import simulate, with_seed
 
 ROOT = Path(__file__).resolve().parents[2]
 DSL_DOC = (ROOT / "docs" / "DSL.md").read_text()
@@ -104,7 +104,7 @@ class Workspace:
             if not rep.ok:
                 return "cannot simulate, the game is invalid:\n" + rep.text()
             spec, n = rep.spec, args.get("seeds") or 5
-            runs = [simulate(spec.model_copy(update={"game": spec.game.model_copy(update={"seed": spec.game.seed + i})}), record_frames=False) for i in range(n)]
+            runs = [simulate(with_seed(spec, i), record_frames=False) for i in range(n)]
             out = {"outcomes": [r.outcome for r in runs], "fight_seconds": [round(r.time, 1) for r in runs], "seed1_summary": runs[0].summary()}
             if args.get("event_types"):
                 out["seed1_events"] = [e for e in runs[0].events if e["type"] in set(args["event_types"])][:60]
@@ -297,6 +297,8 @@ def main(argv=None):
     if a.tasks != "all":
         want = set(a.tasks.split(","))
         tasks = [t for t in tasks if t["id"] in want or t["category"] in want]
+    if not tasks:
+        raise SystemExit(f"no tasks match --tasks {a.tasks!r}; use 'all', a category, or task ids from {ROOT / 'tasks'}")
     client = None if a.arm == "oracle" or a.backend == "claude-code" else _client()
     if client is not None:
         import anthropic
@@ -307,8 +309,9 @@ def main(argv=None):
             raise SystemExit(f"No working Claude API credentials ({type(e).__name__}).\n"
                              f"Set ANTHROPIC_API_KEY (or put it in {ROOT / '.env'}), or run `ant auth login`.")
     tag = a.arm if a.arm == "oracle" else f"{a.arm}__{a.model}__{a.effort}__{a.backend}"
+    import shutil
     import tempfile
-    ws_root = tempfile.mkdtemp(prefix="gamelab-runs-")
+    ws_root = tempfile.mkdtemp(prefix="gamelab-runs-")  # per-task workspaces; final files are copied into results
     out = ROOT / a.out / f"{time.strftime('%Y%m%d-%H%M%S')}__{tag}"
     out.mkdir(parents=True)
     rows = []
@@ -338,6 +341,7 @@ def main(argv=None):
                         for c, ids in {c: {t['id'] for t in tasks if t['category'] == c} for c in sorted({t['category'] for t in tasks})}.items()},
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2))
+    shutil.rmtree(ws_root, ignore_errors=True)
     print(json.dumps(summary, indent=2))
     print(f"results: {out}")
 

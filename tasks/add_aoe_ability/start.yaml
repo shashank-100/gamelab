@@ -15,32 +15,32 @@ characters:
   - {name: staff, type: melee, cooldown: 0.7, damage: 8, range: 1.5}
 enemies:
 - name: goblin_a
-  health: 45
+  health: 70
   speed: 5
   spawn: [30, 5]
   attack: {damage: 3, range: 1.2, cooldown: 1}
 - name: goblin_b
-  health: 45
+  health: 70
   speed: 5
   spawn: [33, 10]
   attack: {damage: 3, range: 1.2, cooldown: 1}
 - name: goblin_c
-  health: 45
+  health: 70
   speed: 5
   spawn: [35, 15]
   attack: {damage: 3, range: 1.2, cooldown: 1}
 - name: goblin_d
-  health: 45
+  health: 70
   speed: 5
   spawn: [33, 20]
   attack: {damage: 3, range: 1.2, cooldown: 1}
 - name: goblin_e
-  health: 45
+  health: 70
   speed: 5
   spawn: [30, 25]
   attack: {damage: 3, range: 1.2, cooldown: 1}
 - name: goblin_f
-  health: 45
+  health: 70
   speed: 5
   spawn: [37, 15]
   attack: {damage: 3, range: 1.2, cooldown: 1}

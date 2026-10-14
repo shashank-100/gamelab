@@ -167,6 +167,11 @@ task("add_heal_ability", "content", "arena",
      _mend)
 
 
+def _slam_start(d):
+    for e in d["enemies"]:  # tougher goblins so slams land non-lethal hits and per-hit damage is observable
+        e["health"] = 70
+
+
 def _slam(d):
     find(d["characters"], "mage")["abilities"].append({"name": "ground_slam", "type": "aoe", "cooldown": 5, "damage": 20, "radius": 4})
 task("add_aoe_ability", "content", "swarm",
@@ -174,7 +179,7 @@ task("add_aoe_ability", "content", "swarm",
      ["characters[mage].abilities"],
      [spec("characters[mage].abilities[ground_slam].radius", "==", 4),
       sim({"damage": {"src": "mage", "ability": "ground_slam"}, "each": 20}, {"outcome": ["win"]})],
-     _slam)
+     _slam, start=_slam_start)
 
 
 def _cleric(d):

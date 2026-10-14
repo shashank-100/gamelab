@@ -86,6 +86,19 @@ def _dist(a, b):
     return math.hypot(a[0] - b[0], a[1] - b[1])
 
 
+def _seg_dist(a, b, p):
+    """Distance from point p to segment a-b, and how far along the segment (0..1) the closest point is."""
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    L2 = dx * dx + dy * dy
+    t = 0.0 if L2 < 1e-12 else max(0.0, min(1.0, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L2))
+    return _dist((a[0] + t * dx, a[1] + t * dy), p), t
+
+
+def with_seed(spec: GameSpec, offset: int) -> GameSpec:
+    """Same game with the seed shifted by `offset` (seed i of a multi-seed run)."""
+    return spec.model_copy(update={"game": spec.game.model_copy(update={"seed": spec.game.seed + offset})})
+
+
 def _unit(v):
     n = math.hypot(*v)
     return (v[0] / n, v[1] / n) if n > 1e-9 else (0.0, 0.0)
@@ -118,6 +131,7 @@ class Sim:
         for i, e in enumerate(starters):
             x, y = e.spawn or (W * 0.85, H * (i + 1) / (len(starters) + 1))
             self.units.append(Unit(e.name, "enemy", x, y, e.health, e.health, e.speed, e.radius, e))
+        self.player = next(u for u in self.units if u.team == "player")
         self.cond = {id(r): conditions.parse(r.when) for e in spec.enemies for r in e.behavior}
         for u in self.units:
             self.emit("spawn", src=u.name, x=round(u.x, 2), y=round(u.y, 2), hp=u.hp)
@@ -211,12 +225,12 @@ class Sim:
 
     # -- enemies -------------------------------------------------------------
     def step_enemy(self, u: Unit):
-        tgt = self.nearest(u, "player")
-        player = next((c for c in self.units if c.team == "player"), None)
+        tgt = self.nearest(u, "player")  # attacks and movement go for the nearest character (player or ally)
+        player = self.player
         ctx = {
             "health": u.hp, "health_max": u.max_hp,
-            "player_health": player.hp if player else 0, "player_health_max": player.max_hp if player else 1,
-            "distance_to_player": _dist(u.pos, tgt.pos) if tgt else 1e9,
+            "player_health": player.hp, "player_health_max": player.max_hp,
+            "distance_to_player": _dist(u.pos, player.pos) if player.alive else 1e9,
             "time": self.t, "enemies_alive": len(self.alive("enemy")),
         }
         move = None
@@ -243,7 +257,11 @@ class Sim:
             elif r.action == "summon":
                 t = self.templates[r.unit]
                 for _ in range(r.count):
-                    k = self.summoned[t.name] = self.summoned.get(t.name, 0) + 1
+                    taken = {x.name for x in self.units}
+                    k = self.summoned.get(t.name, 0) + 1
+                    while f"{t.name}_{k}" in taken:
+                        k += 1
+                    self.summoned[t.name] = k
                     ang = self.rng.uniform(0, 2 * math.pi)
                     m = Unit(f"{t.name}_{k}", "enemy", u.x + math.cos(ang) * 2, u.y + math.sin(ang) * 2, t.health, t.health, t.speed, t.radius, t)
                     self.clamp(m)
@@ -282,15 +300,20 @@ class Sim:
         for s in self.shots:
             s.vy += self.g.gravity * self.dt
             step = math.hypot(s.vx, s.vy) * self.dt
+            x0, y0 = s.x, s.y
             s.x += s.vx * self.dt
             s.y += s.vy * self.dt
             s.range_left -= step
             owner = next(u for u in self.units if u.name == s.owner)
-            hit = None
+            # swept test: the shot hits the first target its path touched this tick, however fast it moves
+            hits = []
             for v in self.alive("enemy" if s.team != "enemy" else "player"):
-                if _dist((s.x, s.y), v.pos) <= s.radius + v.radius:
-                    hit = v
-                    break
+                d, along = _seg_dist((x0, y0), (s.x, s.y), v.pos)
+                if d <= s.radius + v.radius:
+                    hits.append((along, v.name, v))
+            hit = min(hits)[2] if hits else None
+            if hit:  # stop where it hit, not where it would have been
+                s.x, s.y = hit.x, hit.y
             if hit:
                 self.emit("hit", src=s.owner, dst=hit.name, ability=s.ability)
                 self.damage(owner, hit, s.damage, s.ability)
@@ -320,7 +343,7 @@ class Sim:
             self.frames.append(self.frame())
         if not self.alive("enemy"):
             return "win"
-        if not self.alive("player"):
+        if not self.player.alive:
             return "lose"
         if self.t >= self.g.max_seconds - 1e-9:
             return "timeout"

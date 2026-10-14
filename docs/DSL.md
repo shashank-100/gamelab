@@ -58,6 +58,7 @@ Rules are checked top to bottom every tick.
 - Movement actions `chase`, `flee`, `idle`: the **first** matching movement rule wins; with none matching the enemy chases.
 - Instant actions `teleport`, `enrage`, `heal`, `summon` fire whenever their condition holds and they are off cooldown,
   so without `once` or `cooldown` they fire every tick.
+- `once` and `cooldown` only apply to instant actions; a movement rule holds for as long as its condition is true.
 
 ### conditions
 `<variable> <op> <number>[%]`, joined with `and` / `or`. Ops: `< <= > >= == !=`.
@@ -65,10 +66,11 @@ Rules are checked top to bottom every tick.
 |---|---|
 | health | own health; with `%` it is a fraction of max health (`health < 30%`). Without `%` it is absolute hit points. |
 | player_health | the player's health; `%` allowed |
-| distance_to_player | arena units |
+| distance_to_player | arena units to the player (the first character), not to allies |
 | time | seconds since start |
 | enemies_alive | number of living enemies |
 
 ## Outcomes
-`win` when every enemy (including summoned minions) is dead, `lose` when the player dies, `timeout` at `max_seconds`.
+`win` when every enemy (including summoned minions) is dead, `lose` when the player (the first character) dies, even if allies are still alive, `timeout` at `max_seconds`.
+Enemies attack and chase the nearest character, which can be an ally.
 The auto player heals when low, uses aoe/melee up close, shoots in range, dashes to close distance and kites; it has small random variation per seed.
