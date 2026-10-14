@@ -47,12 +47,14 @@ def sample(model, tok, ids, temp, max_tokens=120):
 
 
 def seq_logprob(model, ids, comp):
+    """Mean log-prob of the completion. The vocabulary projection is applied only at completion positions:
+    projecting all ~800 prompt positions onto a 152k vocab costs ~0.5 GB per sample and swaps an 8 GB Mac."""
     x = mx.array([ids + comp])
-    logits = model(x[:, :-1]).astype(mx.float32)
-    lp = nn.log_softmax(logits, axis=-1)
-    tgt = x[:, 1:]
-    tok_lp = mx.take_along_axis(lp, tgt[..., None], axis=-1)[..., 0]
-    return tok_lp[:, len(ids) - 1:].mean()
+    h = model.model(x[:, :-1])[:, len(ids) - 1:]
+    head = model.lm_head if hasattr(model, "lm_head") else model.model.embed_tokens.as_linear
+    lp = nn.log_softmax(head(h).astype(mx.float32), axis=-1)
+    tgt = mx.array([comp])
+    return mx.take_along_axis(lp, tgt[..., None], axis=-1)[..., 0].mean()
 
 
 def evaluate(model, tok, ds, label):
@@ -116,6 +118,7 @@ def main():
                 l, g = sft_grad(model, prompt_ids(tok, t), comp)
                 tot += l.item()
                 acc = g if acc is None else tree_map(lambda x, y: x + y, acc, g)
+                mx.eval(acc)  # evaluate now: a lazy sum would keep every example's activations alive
             sft_opt.update(model, tree_map(lambda x: x / a.sft_batch, acc))
             mx.eval(model.parameters(), sft_opt.state)
             if step % 10 == 0 or step == a.sft_steps - 1:
@@ -150,6 +153,7 @@ def main():
                 adv = (r - mean) / (std + 1e-4)
                 _, g = grad_fn(model, ids, comp, mx.array(adv / a.group))
                 grads_acc = g if grads_acc is None else tree_map(lambda x, y: x + y, grads_acc, g)
+                mx.eval(grads_acc)
                 n_used += 1
         if grads_acc is not None:
             grads_acc = tree_map(lambda x: x / len(batch), grads_acc)

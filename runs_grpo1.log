@@ -1,4 +1,2 @@
-Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s]Fetching 7 files: 100%|██████████| 7/7 [00:00<00:00, 4288.65it/s]
+Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s]Fetching 7 files: 100%|██████████| 7/7 [00:00<00:00, 5427.01it/s]
 model Qwen/Qwen2.5-0.5B-Instruct, trainable LoRA params 5,865,472
-{"label": "before", "n": 100, "accuracy": 0.04, "mean_reward": -0.435, "invalid_rate": 0.95}
-{"sft_step": 0, "nll": 0.6648}
