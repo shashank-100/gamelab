@@ -43,6 +43,7 @@ def sample(model, tok, ids, temp, max_tokens=120):
         out_ids.append(r.token)
         text += r.text
     eos = set(tok.eos_token_ids) if hasattr(tok, "eos_token_ids") else {tok.eos_token_id}
+    mx.clear_cache()  # generation leaves KV-cache buffers in MLX's cache; on 8 GB they push training into swap
     return [i for i in out_ids if i not in eos], text.strip().strip("`").strip()
 
 
@@ -76,7 +77,9 @@ def main():
     p.add_argument("--steps", type=int, default=60)
     p.add_argument("--batch", type=int, default=4, help="requests per step")
     p.add_argument("--group", type=int, default=8, help="samples per request")
-    p.add_argument("--lr", type=float, default=1e-4)
+    p.add_argument("--lr", type=float, default=1e-4, help="SFT learning rate")
+    p.add_argument("--rl-lr", type=float, default=1e-5, help="GRPO learning rate (10x lower: 1e-4 made GRPO diverge)")
+    p.add_argument("--eval-every", type=int, default=10)
     p.add_argument("--temp", type=float, default=1.0)
     p.add_argument("--lora-layers", type=int, default=16)
     p.add_argument("--rank", type=int, default=16)
@@ -87,6 +90,7 @@ def main():
     a = p.parse_args()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
+    mx.set_cache_limit(512 * 1024 * 1024)
     mx.random.seed(0)
     random.seed(0)
 
@@ -121,14 +125,17 @@ def main():
                 mx.eval(acc)  # evaluate now: a lazy sum would keep every example's activations alive
             sft_opt.update(model, tree_map(lambda x: x / a.sft_batch, acc))
             mx.eval(model.parameters(), sft_opt.state)
-            if step % 10 == 0 or step == a.sft_steps - 1:
+            if True:
                 rec = {"sft_step": step, "nll": round(tot / a.sft_batch, 4)}
                 print(json.dumps(rec), flush=True)
                 log.write(json.dumps(rec) + "\n")
         mid = evaluate(model, tok, heldout, "after_sft")
         log.write(json.dumps(mid) + "\n")
 
-    opt = optim.Adam(learning_rate=a.lr)
+    opt = optim.Adam(learning_rate=a.rl_lr)
+    best = mid if a.sft_steps else before
+    best_weights = dict(tree_flatten(model.trainable_parameters()))
+    best_step = -1
 
     def loss_fn(model, ids, comp, adv):
         return -adv * seq_logprob(model, ids, comp)
@@ -164,7 +171,16 @@ def main():
         print(json.dumps(rec), flush=True)
         log.write(json.dumps(rec) + "\n")
         log.flush()
+        if (step + 1) % a.eval_every == 0 and step + 1 < a.steps:
+            ck = evaluate(model, tok, heldout, f"step{step + 1}")
+            log.write(json.dumps(ck) + "\n")
+            if ck["mean_reward"] > best["mean_reward"]:
+                best, best_step = ck, step + 1
+                best_weights = dict(tree_flatten(model.trainable_parameters()))
     after = evaluate(model, tok, heldout, "after")
+    if after["mean_reward"] < best["mean_reward"]:  # keep the best checkpoint, report both honestly
+        model.load_weights(list(best_weights.items()), strict=False)
+        after = {**best, "label": f"best (step {best_step})", "final_step_eval": after}
     log.write(json.dumps(after) + "\n")
     model.save_weights(str(out / "adapters.safetensors"))
     (out / "summary.json").write_text(json.dumps({"before": before, "after_sft": mid if a.sft_steps else None, "after": after, "args": vars(a)}, indent=2))

@@ -1,5 +1,25 @@
 # Results
 
+## Experiment D — RL on a small "tab model" (2026-11-14)
+
+Qwen2.5-0.5B-Instruct + LoRA (rank 16, 16 layers), on an 8 GB Apple M3 with MLX. The model writes edits in a tiny edit
+language (`set` / `add` / `remove` lines) instead of rewriting the game file. Reward = the GameLab checker: 1.0 if the edit
+validates, does what was asked and touches nothing else; partial credit for some checks; -0.5 for unparseable edits or
+invalid games. 60 held-out procedural tasks, disjoint from training.
+
+| Stage | Accuracy | Mean reward | Invalid edits |
+|---|---|---|---|
+| Base model | 5% | -0.43 | 95% |
+| + SFT warm-up (40 steps x 8 reference edits, lr 1e-4) | 65% | 0.58 | 13% |
+| + GRPO (30 steps x 4 requests x 6 samples, lr 1e-5), best checkpoint (step 20) | **70%** | **0.69** | **3%** |
+| GRPO final step (30) | 62% | 0.55 | 13% |
+
+- SFT teaches the format; GRPO removes most invalid edits (13% -> 3%) and adds 5 points of accuracy.
+- GRPO at lr 1e-4 collapsed to 0%. At 1e-5 with held-out checks every 10 steps it improves, then drifts after step 20,
+  so the best checkpoint is kept and the last-step number is reported alongside it. Logs: `docs/runs/experiment_d_*`.
+- On an 8 GB Mac: project only completion positions onto the 152k vocabulary, evaluate accumulated gradients eagerly,
+  and clear MLX's cache after generation, or training swaps.
+
 ## v2 brawler — 2026-11-13, Claude Opus 5.5 (medium), headless Claude Code, 18 tasks
 
 | Arm | Success | Regressions | Mean turns | Mean tokens | Cost (equiv.) |

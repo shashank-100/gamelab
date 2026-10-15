@@ -29,3 +29,15 @@ uv run gamelab-agent --arm dsl_feedback --model claude-opus-5-5     # C: + valid
 Metrics per run: success, regression, invalid final file, turns, tool calls, tokens, wall time (`results/<run>/summary.json`).
 Arm A (agent edits engine source directly) is GameDevBench (`gamedevbench/`, 333 Godot tasks).
 Credentials: `ANTHROPIC_API_KEY`, `.env` in this folder, or `ant auth login`.
+
+## Results (details in docs/RESULTS.md)
+- v1 arena (20 tasks): DSL only 19/20, DSL + validate/simulate 20/20 (Claude Opus 5.5).
+- v2 brawler (18 tasks): DSL only 12/18, DSL + validate/simulate 17/18. Every miss without feedback is a balance task.
+- Experiment D, RL "tab model" (Qwen 0.5B on a laptop): 5% base -> 65% after SFT -> 70% after GRPO.
+
+## Brawler (v2)
+Ring-out arena fighter: damage %, weight, knockback, walls, orbiting rocks, channeled abilities, jump, J/K/J+K buttons.
+`uv run gamelab play games/pro_bending.yaml` (WASD + J/K). Reference: docs/BRAWL.md.
+
+## RL (Experiment D)
+`uv run --extra rl python -m gamelab.rl.grpo --sft-steps 40 --steps 30 --out runs/grpo` (Apple silicon, MLX). Claude Code login works as the agent backend: `--backend claude-code`.

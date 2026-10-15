@@ -1,0 +1,77 @@
+Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s]Fetching 7 files: 100%|██████████| 7/7 [00:00<00:00, 2128.93it/s]
+model Qwen/Qwen2.5-0.5B-Instruct, trainable LoRA params 5,865,472
+{"label": "before", "n": 60, "accuracy": 0.05, "mean_reward": -0.425, "invalid_rate": 0.95}
+{"sft_step": 0, "nll": 0.6648}
+{"sft_step": 1, "nll": 3.4941}
+{"sft_step": 2, "nll": 1.7107}
+{"sft_step": 3, "nll": 1.5659}
+{"sft_step": 4, "nll": 1.3367}
+{"sft_step": 5, "nll": 0.5699}
+{"sft_step": 6, "nll": 0.5254}
+{"sft_step": 7, "nll": 0.8864}
+{"sft_step": 8, "nll": 0.9932}
+{"sft_step": 9, "nll": 0.8122}
+{"sft_step": 10, "nll": 0.4716}
+{"sft_step": 11, "nll": 0.4618}
+{"sft_step": 12, "nll": 0.4169}
+{"sft_step": 13, "nll": 0.2169}
+{"sft_step": 14, "nll": 0.3645}
+{"sft_step": 15, "nll": 0.2366}
+{"sft_step": 16, "nll": 0.1969}
+{"sft_step": 17, "nll": 0.4029}
+{"sft_step": 18, "nll": 0.5766}
+{"sft_step": 19, "nll": 0.1949}
+{"sft_step": 20, "nll": 0.3463}
+{"sft_step": 21, "nll": 0.502}
+{"sft_step": 22, "nll": 0.5219}
+{"sft_step": 23, "nll": 0.4778}
+{"sft_step": 24, "nll": 0.3057}
+{"sft_step": 25, "nll": 0.3397}
+{"sft_step": 26, "nll": 0.1508}
+{"sft_step": 27, "nll": 0.25}
+{"sft_step": 28, "nll": 0.194}
+{"sft_step": 29, "nll": 0.0935}
+{"sft_step": 30, "nll": 0.126}
+{"sft_step": 31, "nll": 0.0938}
+{"sft_step": 32, "nll": 0.0972}
+{"sft_step": 33, "nll": 0.184}
+{"sft_step": 34, "nll": 0.0569}
+{"sft_step": 35, "nll": 0.0901}
+{"sft_step": 36, "nll": 0.1155}
+{"sft_step": 37, "nll": 0.1747}
+{"sft_step": 38, "nll": 0.0872}
+{"sft_step": 39, "nll": 0.1618}
+{"label": "after_sft", "n": 60, "accuracy": 0.65, "mean_reward": 0.583, "invalid_rate": 0.133}
+{"step": 0, "mean_reward": 0.083, "correct": 0.375, "samples_with_signal": 18, "sec": 30.3}
+{"step": 1, "mean_reward": 0.5, "correct": 0.583, "samples_with_signal": 12, "sec": 21.6}
+{"step": 2, "mean_reward": 0.188, "correct": 0.25, "samples_with_signal": 12, "sec": 17.0}
+{"step": 3, "mean_reward": 0.312, "correct": 0.5, "samples_with_signal": 18, "sec": 26.8}
+{"step": 4, "mean_reward": 0.312, "correct": 0.5, "samples_with_signal": 24, "sec": 31.5}
+{"step": 5, "mean_reward": -0.125, "correct": 0.0, "samples_with_signal": 12, "sec": 22.3}
+{"step": 6, "mean_reward": 0.438, "correct": 0.625, "samples_with_signal": 12, "sec": 21.4}
+{"step": 7, "mean_reward": 0.125, "correct": 0.25, "samples_with_signal": 12, "sec": 20.4}
+{"step": 8, "mean_reward": 0.297, "correct": 0.5, "samples_with_signal": 18, "sec": 28.9}
+{"step": 9, "mean_reward": 0.479, "correct": 0.583, "samples_with_signal": 12, "sec": 18.9}
+{"label": "step10", "n": 60, "accuracy": 0.667, "mean_reward": 0.625, "invalid_rate": 0.083}
+{"step": 10, "mean_reward": 0.146, "correct": 0.25, "samples_with_signal": 18, "sec": 24.9}
+{"step": 11, "mean_reward": 0.458, "correct": 0.583, "samples_with_signal": 6, "sec": 16.3}
+{"step": 12, "mean_reward": 0.375, "correct": 0.583, "samples_with_signal": 6, "sec": 21.7}
+{"step": 13, "mean_reward": 0.292, "correct": 0.5, "samples_with_signal": 6, "sec": 17.8}
+{"step": 14, "mean_reward": 0.438, "correct": 0.542, "samples_with_signal": 6, "sec": 18.3}
+{"step": 15, "mean_reward": 0.292, "correct": 0.458, "samples_with_signal": 12, "sec": 19.2}
+{"step": 16, "mean_reward": 0.0, "correct": 0.25, "samples_with_signal": 12, "sec": 23.5}
+{"step": 17, "mean_reward": 0.333, "correct": 0.5, "samples_with_signal": 12, "sec": 18.2}
+{"step": 18, "mean_reward": 0.083, "correct": 0.167, "samples_with_signal": 12, "sec": 21.4}
+{"step": 19, "mean_reward": 0.25, "correct": 0.5, "samples_with_signal": 12, "sec": 22.7}
+{"label": "step20", "n": 60, "accuracy": 0.7, "mean_reward": 0.686, "invalid_rate": 0.033}
+{"step": 20, "mean_reward": 0.333, "correct": 0.5, "samples_with_signal": 12, "sec": 20.9}
+{"step": 21, "mean_reward": 0.654, "correct": 0.75, "samples_with_signal": 6, "sec": 18.2}
+{"step": 22, "mean_reward": 0.75, "correct": 0.75, "samples_with_signal": 0, "sec": 16.8}
+{"step": 23, "mean_reward": 0.438, "correct": 0.625, "samples_with_signal": 6, "sec": 25.6}
+{"step": 24, "mean_reward": 0.312, "correct": 0.5, "samples_with_signal": 6, "sec": 29.9}
+{"step": 25, "mean_reward": 0.667, "correct": 0.667, "samples_with_signal": 6, "sec": 18.2}
+{"step": 26, "mean_reward": 0.333, "correct": 0.5, "samples_with_signal": 6, "sec": 21.9}
+{"step": 27, "mean_reward": 0.25, "correct": 0.5, "samples_with_signal": 0, "sec": 18.5}
+{"step": 28, "mean_reward": 0.688, "correct": 0.708, "samples_with_signal": 6, "sec": 22.3}
+{"step": 29, "mean_reward": 0.167, "correct": 0.292, "samples_with_signal": 6, "sec": 22.5}
+{"label": "after", "n": 60, "accuracy": 0.617, "mean_reward": 0.55, "invalid_rate": 0.133}
