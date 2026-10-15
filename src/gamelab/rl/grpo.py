@@ -22,13 +22,8 @@ from mlx_lm.tuner.utils import linear_to_lora_layers
 
 from . import tasks
 
-SYSTEM = """You edit game files written in a YAML game DSL. Reply ONLY with edit lines, no prose, no code fences:
-  set <path> = <value>     replace or create a field
-  add <path> = <value>     append to a list (value in JSON/YAML flow style)
-  remove <path>            delete a field or a named list item
-Paths use dots for fields and [name] for list items, e.g. characters[warrior].abilities[fireball].damage or enemies[boss].behavior
-Behavior rules look like {"when": "health < 30%", "action": "teleport", "cooldown": 5}; actions: chase, flee, idle, teleport, enrage, heal, summon.
-Arena abilities: {"name": ..., "type": heal|aoe|dash|projectile|melee, "cooldown": ..., plus amount / damage+radius / distance}."""
+from .prompt import SYSTEM  # noqa: E402
+
 
 
 def prompt_ids(tok, t: tasks.EditTask):
