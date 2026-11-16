@@ -12,7 +12,7 @@
 Every miss without the simulator is a task where parameters interact (weight, friction, knockback).
 RL "tab model": Qwen 0.5B learns to write the edits from the simulator's checker, **5% → 65% (SFT) → 70% (GRPO)**.
 
-The whole character above is this much YAML (`games/pro_bending.yaml`):
+A character in the DSL (abridged from `games/pro_bending.yaml`):
 ```yaml
 - name: wrestler
   weight: 2.0
