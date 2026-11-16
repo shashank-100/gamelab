@@ -1,5 +1,30 @@
 # GameLab
 
+<p align="center"><img src="docs/media/brawler.gif" width="420" alt="Two bots fighting in the GameLab brawler: a heavy wrestler (red) vs a fast ninja (blue), damage % above each, ring-out wins"></p>
+
+**Agents change a game by editing a small design file; a deterministic physics simulator is the ground truth.**
+
+| | Claude Opus 5.5, spec only | + run the simulator |
+|---|---|---|
+| Brawler tasks (18) | 12/18 | **17/18** |
+| Arena tasks (20) | 19/20 | **20/20** |
+
+Every miss without the simulator is a task where parameters interact (weight, friction, knockback).
+RL "tab model": Qwen 0.5B learns to write the edits from the simulator's checker, **5% → 65% (SFT) → 70% (GRPO)**.
+
+The whole character above is this much YAML (`games/pro_bending.yaml`):
+```yaml
+- name: wrestler
+  weight: 2.0
+  speed: 3.5
+  abilities:
+    - {name: grapple_slam, kind: strike, button: a, damage: 9, knockback: 7, windup: 0.15}
+    - {name: rock_wall, kind: wall, button: b, length: 5, duration: 3}
+    - {name: earthquake, kind: channel, button: a+b, max_time: 2.0, radius: 4, knockback_max: 22}
+```
+
+---
+
 Can agents reliably create and modify game mechanics through a constrained, human-readable DSL instead of editing engine source?
 
 Three layers: the **engine** (`src/gamelab/engine.py`) is agent-owned; the **DSL** (`docs/DSL.md`) is shared by human and agent; **design** (what feels fun) stays with the human.
