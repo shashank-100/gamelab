@@ -4,6 +4,8 @@
 
 **Agents change a game by editing a small design file; a deterministic physics simulator is the ground truth.**
 
+**▶ Watch fights in 3D:** open `docs/demo/index.html` (replays of real simulator runs: 1v1 and 3v3, walls, rocks, channels, ring-outs). Regenerate with `uv run python tools/export_replay.py`.
+
 | | Claude Opus 5.5, spec only | + run the simulator |
 |---|---|---|
 | Brawler tasks (18) | 12/18 | **17/18** |
