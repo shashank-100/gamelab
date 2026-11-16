@@ -1,10 +1,11 @@
 # GameLab
 
-<p align="center"><img src="docs/media/brawler.gif" width="420" alt="Two bots fighting in the GameLab brawler: a heavy wrestler (red) vs a fast ninja (blue), damage % above each, ring-out wins"></p>
+<p align="center"><img src="docs/media/gamelab_3v3.gif" width="720" alt="3D replay of a simulated 3v3 GameLab fight: red team (wrestler, earthbender, ninja) vs three blue ninjas on a floating platform, with walls, orbiting rocks and damage percentages"></p>
+<p align="center"><b><a href="https://shashank-100.github.io/gamelab/docs/demo/">▶ Watch it live in your browser</a></b> · <a href="docs/media/gamelab_3v3.mp4">MP4</a></p>
 
 **Agents change a game by editing a small design file; a deterministic physics simulator is the ground truth.**
 
-**▶ Watch fights in 3D:** open `docs/demo/index.html` (replays of real simulator runs: 1v1 and 3v3, walls, rocks, channels, ring-outs). Regenerate with `uv run python tools/export_replay.py`.
+**3D replay viewer:** `docs/demo/index.html`, live at https://shashank-100.github.io/gamelab/docs/demo/ (replays of real simulator runs: 1v1 and 3v3, walls, rocks, channels, ring-outs). Regenerate with `uv run python tools/export_replay.py`.
 
 | | Claude Opus 5.5, spec only | + run the simulator |
 |---|---|---|

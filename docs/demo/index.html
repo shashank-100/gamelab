@@ -218,7 +218,7 @@ function render(dt) {
   target.lerp(new THREE.Vector3(c.x * 0.7, 0, c.z * 0.7), 0.06);
   camera.position.lerp(new THREE.Vector3(target.x + Math.sin(ang) * dist, dist * 0.75, target.z + Math.cos(ang) * dist), 0.05);
   camera.lookAt(target);
-  document.getElementById("scrub").value = Math.round(t / replay.duration * 1000);
+  { const sc = document.getElementById("scrub"); sc.value = Math.round(t / replay.duration * sc.max); }
   document.getElementById("time").textContent = `${t.toFixed(1)}s / ${replay.duration.toFixed(0)}s`;
 }
 
@@ -228,7 +228,7 @@ R.forEach((r, i) => pick.insertAdjacentHTML("beforeend", `<option value="${i}">$
 pick.onchange = () => build(+pick.value);
 document.getElementById("play").onclick = e => { if (done) { t = 0; evIdx = 0; done = false; banner.style.display = "none"; } playing = !playing || done; e.target.textContent = playing ? "Pause" : "Play"; };
 document.getElementById("speed").onchange = e => speed = +e.target.value;
-document.getElementById("scrub").oninput = e => { t = e.target.value / 1000 * replay.duration; evIdx = replay.events.findIndex(x => x.t > t); if (evIdx < 0) evIdx = replay.events.length; done = false; banner.style.display = "none"; };
+document.getElementById("scrub").oninput = e => { t = e.target.value / e.target.max * replay.duration; evIdx = replay.events.findIndex(x => x.t > t); if (evIdx < 0) evIdx = replay.events.length; done = false; banner.style.display = "none"; };
 const resize = () => { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); };
 addEventListener("resize", resize); resize();
 const params = new URLSearchParams(location.search);
