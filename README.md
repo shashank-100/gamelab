@@ -1,7 +1,7 @@
 # GameLab
 
 <p align="center"><img src="docs/media/gamelab_3v3.gif" width="720" alt="3D replay of a simulated 3v3 GameLab fight: red team (wrestler, earthbender, ninja) vs three blue ninjas on a floating platform, with walls, orbiting rocks and damage percentages"></p>
-<p align="center"><b><a href="https://shashank-100.github.io/gamelab/docs/demo/">▶ Watch it live in your browser</a></b> · <a href="docs/media/gamelab_3v3.mp4">MP4</a></p>
+<p align="center"><b><a href="https://shashank-100.github.io/gamelab/docs/demo/">▶ Watch it live in your browser</a></b> · <a href="docs/media/gamelab_3v3.mp4">full MP4</a><br><sub>Characters: "Robot Expressive" by Tomás Laulhé (CC0), from the three.js examples.</sub></p>
 
 **Agents change a game by editing a small design file; a deterministic physics simulator is the ground truth.**
 

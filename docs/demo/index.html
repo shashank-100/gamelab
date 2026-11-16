@@ -5,35 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GameLab Replays</title>
 <style>
-  :root { --bg:#0d1017; --panel:#161a24; --line:#2a3040; --text:#e6e9f0; --dim:#8b93a7; --red:#ff5d4f; --blue:#4fa3ff; --green:#5fe0a0; --gold:#ffd166; }
+  :root { --bg:#0b0e16; --panel:#141925; --line:#2a3142; --text:#eef1f7; --dim:#8f97ab; --red:#ff5d4f; --blue:#4fa3ff; --gold:#ffd166; }
   * { box-sizing:border-box; }
   html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font:14px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif; overflow:hidden; }
   #stage { position:fixed; inset:0; }
   .hud { position:fixed; left:16px; right:16px; pointer-events:none; }
   .top { top:14px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
-  .card { background:rgba(22,26,36,.82); border:1px solid var(--line); border-radius:10px; padding:10px 12px; pointer-events:auto; backdrop-filter:blur(6px); }
-  h1 { font-size:15px; margin:0 0 2px; letter-spacing:.2px; }
+  .card { background:rgba(20,25,37,.78); border:1px solid var(--line); border-radius:12px; padding:10px 12px; pointer-events:auto; backdrop-filter:blur(8px); }
+  h1 { font-size:15px; margin:0 0 2px; letter-spacing:.3px; }
   .sub { color:var(--dim); font-size:12px; }
-  .bars { display:flex; flex-direction:column; gap:6px; min-width:200px; }
+  .bars { display:flex; flex-direction:column; gap:6px; min-width:210px; }
   .bar { display:flex; align-items:center; gap:8px; font-size:12px; }
-  .dot { width:10px; height:10px; border-radius:50%; flex:none; }
-  .pct { margin-left:auto; font-variant-numeric:tabular-nums; font-weight:600; }
+  .dot { width:10px; height:10px; border-radius:50%; flex:none; box-shadow:0 0 8px currentColor; }
+  .pct { margin-left:auto; font-variant-numeric:tabular-nums; font-weight:700; }
   .ko { color:var(--dim); text-decoration:line-through; }
-  .bottom { bottom:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .bottom { bottom:14px; display:flex; gap:10px; align-items:center; }
   button, select { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:7px 11px; font:inherit; cursor:pointer; }
-  button:hover, select:hover { border-color:#3c4560; }
   input[type=range] { flex:1; min-width:140px; accent-color:var(--gold); }
   #time { font-variant-numeric:tabular-nums; color:var(--dim); min-width:88px; text-align:right; }
-  #feed { position:fixed; right:16px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:4px; width:240px; pointer-events:none; }
-  .ev { background:rgba(22,26,36,.85); border:1px solid var(--line); border-radius:7px; padding:5px 8px; font-size:12px; transition:opacity 1.2s; }
-  .ev.ko { border-color:var(--gold); color:var(--gold); text-decoration:none; }
-  .label { position:fixed; transform:translate(-50%,-100%); font-size:12px; font-weight:700; text-shadow:0 1px 3px #000, 0 0 2px #000; pointer-events:none; white-space:nowrap; }
-  #banner { position:fixed; inset:0; display:none; align-items:center; justify-content:center; font-size:40px; font-weight:800; letter-spacing:2px; text-shadow:0 4px 30px #000; pointer-events:none; }
-  @media (max-width:700px) { #feed { display:none; } .top { flex-direction:column; } }
+  #feed { position:fixed; right:16px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:4px; width:250px; pointer-events:none; }
+  .ev { background:rgba(20,25,37,.85); border:1px solid var(--line); border-radius:8px; padding:5px 9px; font-size:12px; transition:opacity 1.2s; }
+  .ev.ko { border-color:var(--gold); color:var(--gold); text-decoration:none; font-weight:700; }
+  .label { position:fixed; transform:translate(-50%,-100%); font-size:13px; font-weight:800; text-shadow:0 1px 3px #000, 0 0 2px #000; pointer-events:none; white-space:nowrap; }
+  #banner { position:fixed; inset:0; display:none; align-items:center; justify-content:center; font-size:46px; font-weight:900; letter-spacing:3px; text-shadow:0 4px 40px #000, 0 0 20px currentColor; pointer-events:none; }
+  #koflash { position:fixed; inset:0; pointer-events:none; background:radial-gradient(circle, transparent 40%, rgba(255,209,102,.35)); opacity:0; }
+  @media (max-width:700px) { #feed { display:none; } .top { flex-direction:column; } .bars { min-width:0; } }
 </style>
 </head>
 <body>
 <div id="stage"></div>
+<div id="koflash"></div>
 <div class="hud top">
   <div class="card"><h1 id="title">GameLab replays</h1><div class="sub" id="meta">Real fights from the deterministic simulator</div></div>
   <div class="card bars" id="bars"></div>
@@ -45,100 +46,200 @@
     <select id="pick"></select>
     <button id="play">Pause</button>
     <select id="speed"><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="2">2x</option></select>
-    <input id="scrub" type="range" min="0" max="1000" value="0">
+    <input id="scrub" type="range" min="0" max="100000" value="0">
     <span id="time">0.0s</span>
   </div>
 </div>
 <script src="replays.js"></script>
-<script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }</script>
+<script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }</script>
 <script type="module">
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import * as SkeletonUtils from "three/addons/utils/SkeletonUtils.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
+// Character model: "Robot Expressive" by Tomás Laulhé (CC0), from the three.js examples.
+const MODEL = "https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/models/gltf/RobotExpressive/RobotExpressive.glb";
 const TEAM = { red: 0xff5d4f, blue: 0x4fa3ff, green: 0x5fe0a0, gold: 0xffd166 };
 const css = c => "#" + c.toString(16).padStart(6, "0");
 const R = window.REPLAYS;
+const SIZE = { wrestler: 1.25, earthbender: 1.1, ninja: 0.88 };
 
-// ---------- scene ----------
+// ---------- renderer, scene, post ----------
 const stage = document.getElementById("stage");
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
 stage.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0d1017);
-scene.fog = new THREE.Fog(0x0d1017, 40, 90);
-const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 200);
-scene.add(new THREE.HemisphereLight(0xbcd2ff, 0x1a1408, 0.9));
-const sun = new THREE.DirectionalLight(0xffffff, 1.6);
-sun.position.set(12, 30, 10);
-sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
-Object.assign(sun.shadow.camera, { left: -22, right: 22, top: 22, bottom: -22 });
-scene.add(sun);
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 400);
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.5, 0.82);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
 
-// starfield / void below the platform
-const stars = new THREE.BufferGeometry();
-const sp = [];
-for (let i = 0; i < 900; i++) sp.push((Math.random() - 0.5) * 160, -10 - Math.random() * 60, (Math.random() - 0.5) * 160);
-stars.setAttribute("position", new THREE.Float32BufferAttribute(sp, 3));
-scene.add(new THREE.Points(stars, new THREE.PointsMaterial({ color: 0x6f7ea8, size: 0.25 })));
-
-let world = new THREE.Group(); scene.add(world);
-let replay, units = {}, labels = {}, wallMeshes = [], rockMeshes = [], shotMeshes = [], fx = [];
-
-function lowpolyBody(color, radius, kind) {
-  const g = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.55, metalness: 0.05 });
-  const dark = new THREE.MeshStandardMaterial({ color: 0x1b1f2a, flatShading: true });
-  const h = kind === "wrestler" ? 1.5 : kind === "earthbender" ? 1.4 : 1.25;
-  const w = radius * (kind === "wrestler" ? 1.15 : 0.95);
-  const body = new THREE.Mesh(new THREE.CylinderGeometry(w * 0.85, w, h, 7), mat); body.position.y = h / 2; body.castShadow = true;
-  const head = new THREE.Mesh(new THREE.IcosahedronGeometry(w * 0.55, 0), mat); head.position.y = h + w * 0.45; head.castShadow = true;
-  const eye = new THREE.Mesh(new THREE.BoxGeometry(w * 0.7, w * 0.12, 0.05), dark); eye.position.set(0, h + w * 0.5, w * 0.5);
-  g.add(body, head, eye);
-  if (kind === "ninja") { const band = new THREE.Mesh(new THREE.TorusGeometry(w * 0.56, 0.06, 4, 8), dark); band.rotation.x = Math.PI / 2; band.position.y = h + w * 0.55; g.add(band); }
-  if (kind === "wrestler") { const belt = new THREE.Mesh(new THREE.CylinderGeometry(w * 0.98, w * 0.98, 0.18, 7), new THREE.MeshStandardMaterial({ color: 0xffd166, flatShading: true, metalness: 0.4 })); belt.position.y = h * 0.42; g.add(belt); }
-  const ring = new THREE.Mesh(new THREE.RingGeometry(w * 1.25, w * 1.45, 24), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.0, side: THREE.DoubleSide }));
-  ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05; g.add(ring); g.userData.ring = ring;
-  const shadow = new THREE.Mesh(new THREE.CircleGeometry(w, 16), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35 }));
-  shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.02; g.userData.shadow = shadow;
-  g.userData.h = h;
-  return g;
+// sky: vertical gradient on a big sphere
+{
+  const g = new THREE.SphereGeometry(200, 32, 16);
+  const m = new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, uniforms: { top: { value: new THREE.Color(0x1d2a4a) }, mid: { value: new THREE.Color(0x3a2a4f) }, bot: { value: new THREE.Color(0x07080d) } },
+    vertexShader: "varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
+    fragmentShader: "uniform vec3 top; uniform vec3 mid; uniform vec3 bot; varying vec3 vP; void main(){ float h = vP.y; vec3 c = h > 0.0 ? mix(mid, top, smoothstep(0.0, 0.6, h)) : mix(mid, bot, smoothstep(0.0, 0.5, -h)); gl_FragColor = vec4(c, 1.0); }" });
+  scene.add(new THREE.Mesh(g, m));
 }
+scene.fog = new THREE.Fog(0x241d36, 45, 120);
+scene.add(new THREE.HemisphereLight(0xb9ccff, 0x2a1d10, 0.75));
+const sun = new THREE.DirectionalLight(0xffe9c7, 2.2);
+sun.position.set(14, 32, 12); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0005;
+Object.assign(sun.shadow.camera, { left: -24, right: 24, top: 24, bottom: -24, far: 90 });
+scene.add(sun);
+const rimLight = new THREE.DirectionalLight(0x8fb4ff, 0.9); rimLight.position.set(-16, 10, -18); scene.add(rimLight);
+
+// distant floating islands + embers
+const backdrop = new THREE.Group(); scene.add(backdrop);
+{
+  const rock = new THREE.MeshStandardMaterial({ color: 0x3b3550, flatShading: true, roughness: 1 });
+  const grass = new THREE.MeshStandardMaterial({ color: 0x4f6b4a, flatShading: true, roughness: 1 });
+  for (let i = 0; i < 9; i++) {
+    const a = i / 9 * Math.PI * 2 + 0.3, d = 55 + (i % 3) * 14, s = 2.5 + (i * 37 % 5);
+    const isl = new THREE.Group();
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(s, s * 2.2, 6), rock); cone.rotation.x = Math.PI; cone.position.y = -s * 1.1;
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(s * 1.02, s, 0.5, 6), grass);
+    isl.add(cone, cap); isl.position.set(Math.cos(a) * d, -6 + (i % 4) * 5, Math.sin(a) * d); isl.userData.bob = i;
+    backdrop.add(isl);
+  }
+  const pts = []; for (let i = 0; i < 700; i++) pts.push((Math.random() - .5) * 150, Math.random() * 40 - 25, (Math.random() - .5) * 150);
+  const eg = new THREE.BufferGeometry(); eg.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+  backdrop.add(new THREE.Points(eg, new THREE.PointsMaterial({ color: 0xffc98a, size: 0.18, transparent: true, opacity: 0.7 })));
+}
+
+// stone tile texture for the arena top
+function tileTexture() {
+  const c = document.createElement("canvas"); c.width = c.height = 512; const x = c.getContext("2d");
+  x.fillStyle = "#4a4f63"; x.fillRect(0, 0, 512, 512);
+  const n = 8, s = 512 / n;
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    const v = 70 + ((i * 31 + j * 17) % 23); x.fillStyle = `rgb(${v},${v + 4},${v + 20})`;
+    x.fillRect(i * s + 3, j * s + 3, s - 6, s - 6);
+    for (let k = 0; k < 18; k++) { x.fillStyle = `rgba(0,0,0,${Math.random() * .08})`; x.fillRect(i * s + Math.random() * s, j * s + Math.random() * s, 4, 4); }
+  }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+
+// ---------- characters ----------
+let gltf = null;
+const fallbackBody = (color, radius) => {
+  const g = new THREE.Group();
+  const m = new THREE.MeshStandardMaterial({ color, flatShading: true });
+  const b = new THREE.Mesh(new THREE.CylinderGeometry(radius * .8, radius, 1.4, 7), m); b.position.y = .7; b.castShadow = true;
+  const h = new THREE.Mesh(new THREE.IcosahedronGeometry(radius * .55, 0), m); h.position.y = 1.7; h.castShadow = true;
+  g.add(b, h); g.userData.mats = [m]; return g;
+};
+
+function makeFighter(team, character, radius) {
+  const color = TEAM[team] ?? 0xffffff;
+  const root = new THREE.Group();
+  let body, mixer = null, actions = {};
+  if (gltf) {
+    body = SkeletonUtils.clone(gltf.scene);
+    const mats = [];
+    body.traverse(o => {
+      if (o.isMesh) {
+        o.castShadow = true; o.material = o.material.clone();
+        if (o.material.name === "Main") o.material.color.set(color).multiplyScalar(0.85);
+        if (o.material.name === "Grey") o.material.color.lerp(new THREE.Color(color), 0.25);
+        o.material.emissive = new THREE.Color(0x000000); mats.push(o.material);
+      }
+    });
+    const s = (SIZE[character] ?? 1) * 0.42;
+    body.scale.setScalar(s);
+    mixer = new THREE.AnimationMixer(body);
+    for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
+    for (const n of ["Death", "Jump", "Punch"]) if (actions[n]) { actions[n].setLoop(THREE.LoopOnce); actions[n].clampWhenFinished = true; }
+    actions.Idle?.play();
+    body.userData.mats = mats;
+  } else body = fallbackBody(color, radius);
+  root.add(body);
+  // team ring + soft shadow + channel aura
+  const ring = new THREE.Mesh(new THREE.RingGeometry(radius * 1.1, radius * 1.35, 32), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.85, side: THREE.DoubleSide }));
+  ring.rotation.x = -Math.PI / 2; ring.position.y = 0.04;
+  const aura = new THREE.Mesh(new THREE.RingGeometry(radius * 1.5, radius * 1.9, 40), new THREE.MeshBasicMaterial({ color: 0xffd166, transparent: true, opacity: 0, side: THREE.DoubleSide }));
+  aura.rotation.x = -Math.PI / 2; aura.position.y = 0.06;
+  const pointer = new THREE.PointLight(color, 0, 6);
+  pointer.position.y = 1.2;
+  root.add(pointer);
+  return { root, body, mixer, actions, current: "Idle", ring, aura, pointer, mats: body.userData.mats };
+}
+
+function playAction(f, name, fade = 0.15) {
+  if (!f.mixer || f.current === name || !f.actions[name]) return;
+  const next = f.actions[name], prev = f.actions[f.current];
+  next.reset(); next.play();
+  if (prev) next.crossFadeFrom(prev, fade, false);
+  f.current = name;
+}
+
+// ---------- world ----------
+let world = new THREE.Group(); scene.add(world);
+let replay, fighters = {}, labels = {}, wallMeshes = [], rockMeshes = [], shotMeshes = [], fx = [], debris = [];
+let attackTimes = {}, hurtTimes = {};
 
 function build(i) {
   scene.remove(world); world = new THREE.Group(); scene.add(world);
-  replay = R[i]; units = {}; wallMeshes = []; rockMeshes = []; shotMeshes = []; fx = [];
+  replay = R[i]; fighters = {}; wallMeshes = []; rockMeshes = []; shotMeshes = []; fx = []; debris = [];
   document.querySelectorAll(".label").forEach(e => e.remove()); labels = {};
   const Rr = replay.radius;
-  // floating platform: top disc + rocky underside
-  const top = new THREE.Mesh(new THREE.CylinderGeometry(Rr, Rr, 0.6, 48), new THREE.MeshStandardMaterial({ color: 0x3a4157, flatShading: true, roughness: 0.9 }));
-  top.position.y = -0.3; top.receiveShadow = true; world.add(top);
-  const under = new THREE.Mesh(new THREE.ConeGeometry(Rr * 0.92, Rr * 0.9, 9, 1), new THREE.MeshStandardMaterial({ color: 0x232838, flatShading: true }));
-  under.rotation.x = Math.PI; under.position.y = -0.6 - Rr * 0.45; world.add(under);
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(Rr, 0.08, 6, 64), new THREE.MeshBasicMaterial({ color: 0x6f7ea8 }));
-  rim.rotation.x = Math.PI / 2; rim.position.y = 0.02; world.add(rim);
-  const inner = new THREE.Mesh(new THREE.RingGeometry(Rr * 0.3, Rr * 0.31, 48), new THREE.MeshBasicMaterial({ color: 0x4b5470 }));
-  inner.rotation.x = -Math.PI / 2; inner.position.y = 0.01; world.add(inner);
+  const tex = tileTexture(); tex.repeat.set(Rr / 3, Rr / 3);
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(Rr, Rr * 0.97, 0.9, 64), [
+    new THREE.MeshStandardMaterial({ color: 0x5b5468, flatShading: true, roughness: 1 }),
+    new THREE.MeshStandardMaterial({ map: tex, roughness: 0.85 }),
+    new THREE.MeshStandardMaterial({ color: 0x2b2738, roughness: 1 })]);
+  top.position.y = -0.45; top.receiveShadow = true; world.add(top);
+  const under = new THREE.Mesh(new THREE.ConeGeometry(Rr * 0.95, Rr * 1.1, 10, 3), new THREE.MeshStandardMaterial({ color: 0x3a3247, flatShading: true, roughness: 1 }));
+  under.rotation.x = Math.PI; under.position.y = -0.9 - Rr * 0.55; world.add(under);
+  // glowing edge + rim stones
+  const edge = new THREE.Mesh(new THREE.TorusGeometry(Rr, 0.07, 6, 96), new THREE.MeshBasicMaterial({ color: 0x9fd0ff }));
+  edge.rotation.x = Math.PI / 2; edge.position.y = 0.03; world.add(edge);
+  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x6d6580, flatShading: true });
+  for (let k = 0; k < 28; k++) {
+    const a = k / 28 * Math.PI * 2, s = 0.35 + (k * 13 % 5) * 0.08;
+    const st = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), stoneMat);
+    st.position.set(Math.cos(a) * (Rr + 0.15), -0.25, Math.sin(a) * (Rr + 0.15)); st.rotation.set(k, k * 2, 0); st.castShadow = true; world.add(st);
+  }
+  const center = new THREE.Mesh(new THREE.RingGeometry(Rr * 0.29, Rr * 0.31, 64), new THREE.MeshBasicMaterial({ color: 0x8a7cc0, transparent: true, opacity: 0.25 }));
+  center.rotation.x = -Math.PI / 2; center.position.y = 0.02; world.add(center);
+
+  attackTimes = {}; hurtTimes = {};
+  for (const e of replay.events) {
+    if (e.type === "hit") { (attackTimes[e.src] ??= []).push(e.t); (hurtTimes[e.dst] ??= []).push([e.t, e.knockback || 0]); }
+  }
   for (const [name, u] of Object.entries(replay.units)) {
     const ch = replay.characters[u.character];
-    const g = lowpolyBody(TEAM[u.team] ?? 0xffffff, ch.radius, u.character);
-    world.add(g); world.add(g.userData.shadow);
-    units[name] = g;
+    const f = makeFighter(u.team, u.character, ch.radius);
+    world.add(f.root); f.root.add(f.ring, f.aura);
+    fighters[name] = f;
     const el = document.createElement("div"); el.className = "label"; el.style.color = css(TEAM[u.team] ?? 0xffffff);
     document.body.appendChild(el); labels[name] = el;
   }
-  camera.position.set(0, Rr * 1.55, Rr * 1.75);
+  camera.position.set(0, Rr * 1.2, Rr * 1.6);
+  target.set(0, 0, 0);
   document.getElementById("title").textContent = replay.title;
   document.getElementById("meta").textContent = `seed ${replay.seed} · ${replay.duration}s · winner: ${replay.winner} · simulated, then replayed`;
-  t = 0; evIdx = 0; done = false; document.getElementById("feed").innerHTML = ""; banner.style.display = "none";
+  t = 0; prevT = 0; evIdx = 0; done = false; shake = 0;
+  document.getElementById("feed").innerHTML = ""; banner.style.display = "none";
 }
 
 // ---------- playback ----------
-let t = 0, playing = true, speed = 1, evIdx = 0, done = false;
+let t = 0, prevT = 0, playing = true, speed = 1, evIdx = 0, done = false, shake = 0;
 const target = new THREE.Vector3();
 const banner = document.getElementById("banner");
+const koflash = document.getElementById("koflash");
 const frameAt = time => {
   const F = replay.frames; let lo = 0, hi = F.length - 1;
   while (lo < hi) { const m = (lo + hi + 1) >> 1; if (F[m].t <= time) lo = m; else hi = m - 1; }
@@ -146,15 +247,24 @@ const frameAt = time => {
   return [a, b, b.t > a.t ? Math.min(1, (time - a.t) / (b.t - a.t)) : 0];
 };
 const unitMap = f => Object.fromEntries(f.u.map(u => [u[0], u]));
+const within = (arr, lo, hi) => (arr || []).some(x => (Array.isArray(x) ? x[0] : x) >= lo && (Array.isArray(x) ? x[0] : x) <= hi);
+// slow motion around knockouts
+const slowAt = time => replay.events.some(e => e.type === "ko" && time > e.t - 0.5 && time < e.t + 0.9) ? 0.3 : 1;
+window.__slowAt = time => slowAt(time);
 
-function syncPool(pool, n, make) {
-  while (pool.length < n) { const m = make(); world.add(m); pool.push(m); }
-  pool.forEach((m, i) => m.visible = i < n);
-}
+function syncPool(pool, n, make) { while (pool.length < n) { const m = make(); world.add(m); pool.push(m); } pool.forEach((m, i) => m.visible = i < n); }
 
-function spawnFx(pos, color, big) {
-  const m = new THREE.Mesh(new THREE.RingGeometry(0.2, 0.45, 20), new THREE.MeshBasicMaterial({ color, transparent: true, side: THREE.DoubleSide }));
-  m.rotation.x = -Math.PI / 2; m.position.set(pos.x, 0.08, pos.z); m.userData = { age: 0, big }; world.add(m); fx.push(m);
+function burst(pos, color, n, power) {
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.15, 0.4, 28), new THREE.MeshBasicMaterial({ color, transparent: true, side: THREE.DoubleSide }));
+  ring.rotation.x = -Math.PI / 2; ring.position.set(pos.x, 0.1, pos.z); ring.userData = { age: 0, grow: 5 + power * 0.5 }; world.add(ring); fx.push(ring);
+  const geo = new THREE.TetrahedronGeometry(0.09, 0);
+  for (let k = 0; k < n; k++) {
+    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: k % 3 ? color : 0xffffff, transparent: true }));
+    m.position.set(pos.x, 0.8 + Math.random() * 0.6, pos.z);
+    const a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * (2 + power * 0.15);
+    m.userData = { v: new THREE.Vector3(Math.cos(a) * sp, 2 + Math.random() * 4, Math.sin(a) * sp), age: 0 };
+    world.add(m); debris.push(m);
+  }
 }
 
 function pushFeed(text, ko) {
@@ -165,76 +275,115 @@ function pushFeed(text, ko) {
 }
 const short = n => n.replace(/^(red|blue)_/, "");
 
-function render(dt) {
+function update() {
   if (!replay) return;
-  if (playing && !done) t += dt * speed;
-  if (t >= replay.duration) { t = replay.duration; if (!done) { done = true; banner.style.display = "flex"; banner.style.color = css(TEAM[replay.winner] ?? 0xffffff); banner.textContent = replay.winner === "draw" ? "DRAW" : `${replay.winner.toUpperCase()} WINS`; } }
+  const sdt = Math.max(0, Math.min(0.1, t - prevT)); // simulated time step: everything animates in sim time
+  prevT = t;
+  if (t >= replay.duration && !done) {
+    done = true; banner.style.display = "flex"; banner.style.color = css(TEAM[replay.winner] ?? 0xffffff);
+    banner.textContent = replay.winner === "draw" ? "DRAW" : `${replay.winner.toUpperCase()} WINS`;
+  }
   const [a, b, k] = frameAt(t), A = unitMap(a), B = unitMap(b);
   const bars = document.getElementById("bars"); bars.innerHTML = "";
-  for (const [name, g] of Object.entries(units)) {
+  for (const [name, f] of Object.entries(fighters)) {
     const ua = A[name], ub = B[name] || ua; if (!ua) continue;
-    const x = ua[2] + (ub[2] - ua[2]) * k, z = ua[3] + (ub[3] - ua[3]) * k, alive = ua[5], air = ua[6], ch = ua[7], dmg = ua[4];
-    const off = Math.hypot(x, z) > replay.radius;
-    g.userData.fallY = alive ? 0 : (g.userData.fallY ?? 0) - dt * 14;
-    const y = alive ? (air ? 1.4 + Math.sin(t * 6) * 0.15 : 0) : g.userData.fallY;
-    g.position.set(x, y, z);
-    const dx = ub[2] - ua[2], dz = ub[3] - ua[3];
-    if (Math.hypot(dx, dz) > 0.01) g.rotation.y = Math.atan2(dx, dz);
-    g.userData.shadow.visible = alive && !off; g.userData.shadow.position.set(x, 0.02, z);
-    g.userData.shadow.scale.setScalar(air ? 0.7 : 1);
-    const ring = g.userData.ring; ring.material.opacity = ch ? 0.5 + 0.4 * Math.sin(t * 12) : 0; ring.scale.setScalar(ch ? 1 + 0.25 * Math.sin(t * 6) : 1);
-    g.visible = y > -25;
-    const p = new THREE.Vector3(x, y + g.userData.h + 1.1, z).project(camera);
+    const x = ua[2] + (ub[2] - ua[2]) * k, z = ua[3] + (ub[3] - ua[3]) * k, alive = ua[5], air = ua[6], chan = ua[7], dmg = ua[4];
+    const vx = ub[2] - ua[2], vz = ub[3] - ua[3], moving = Math.hypot(vx, vz) > 0.025;
+    f.fallY = alive ? 0 : (f.fallY ?? 0) - sdt * 16;
+    const y = alive ? (air ? 1.3 + Math.sin(t * 5) * 0.2 : 0) : f.fallY;
+    f.root.position.set(x, y, z);
+    if (moving) { const ang = Math.atan2(vx, vz); f.root.rotation.y += (((ang - f.root.rotation.y + Math.PI * 3) % (Math.PI * 2)) - Math.PI) * 0.35; }
+    // animation state from simulator state + events
+    const hurt = (hurtTimes[name] || []).find(([ht]) => t >= ht && t <= ht + 0.18);
+    let anim = "Idle";
+    if (!alive || air) anim = "Jump";
+    else if (within(attackTimes[name], t - 0.3, t)) anim = "Punch";
+    else if (chan) anim = "Dance";
+    else if (moving) anim = "Running";
+    playAction(f, anim);
+    if (f.mixer) f.mixer.update(sdt * (anim === "Running" ? 1.4 : 1));
+    // hit flash + channel aura
+    for (const m of f.mats || []) m.emissive?.setRGB(hurt ? 1 : 0, hurt ? 0.85 : 0, hurt ? 0.6 : 0);
+    f.aura.material.opacity = chan ? 0.5 + 0.4 * Math.sin(t * 14) : 0; f.aura.scale.setScalar(chan ? 1 + 0.3 * Math.sin(t * 7) : 1);
+    f.pointer.intensity = chan ? 6 : (hurt ? 4 : 0);
+    f.ring.visible = alive && !air;
+    f.root.visible = y > -30;
+    const p = new THREE.Vector3(x, y + 2.3 * (SIZE[replay.units[name].character] ?? 1), z).project(camera);
     const el = labels[name];
-    el.style.display = g.visible && p.z < 1 ? "block" : "none";
+    el.style.display = f.root.visible && p.z < 1 ? "block" : "none";
     el.style.left = ((p.x + 1) / 2 * innerWidth) + "px"; el.style.top = ((1 - p.y) / 2 * innerHeight) + "px";
     el.textContent = `${dmg}%`;
+    el.style.fontSize = `${12 + Math.min(10, dmg / 25)}px`;
     const team = replay.units[name].team;
-    bars.insertAdjacentHTML("beforeend", `<div class="bar ${alive ? "" : "ko"}"><span class="dot" style="background:${css(TEAM[team] ?? 0xffffff)}"></span>${short(name)}<span class="pct">${alive ? dmg + "%" : "KO"}</span></div>`);
+    bars.insertAdjacentHTML("beforeend", `<div class="bar ${alive ? "" : "ko"}"><span class="dot" style="background:${css(TEAM[team] ?? 0xffffff)};color:${css(TEAM[team] ?? 0xffffff)}"></span>${short(name)}<span class="pct">${alive ? dmg + "%" : "KO"}</span></div>`);
   }
-  syncPool(wallMeshes, a.w.length, () => { const m = new THREE.Mesh(new THREE.BoxGeometry(1, 1.6, 0.35), new THREE.MeshStandardMaterial({ color: 0xa8875c, flatShading: true, roughness: 1 })); m.castShadow = true; return m; });
-  a.w.forEach(([x1, y1, x2, y2], i) => { const m = wallMeshes[i]; const L = Math.hypot(x2 - x1, y2 - y1); m.scale.x = L; m.position.set((x1 + x2) / 2, 0.8, (y1 + y2) / 2); m.rotation.y = -Math.atan2(y2 - y1, x2 - x1); });
-  syncPool(rockMeshes, a.r.length, () => { const m = new THREE.Mesh(new THREE.DodecahedronGeometry(0.45, 0), new THREE.MeshStandardMaterial({ color: 0x8c6a4a, flatShading: true })); m.castShadow = true; return m; });
-  a.r.forEach(([x, y], i) => { const m = rockMeshes[i]; m.position.set(x, 0.7 + Math.sin(t * 5 + i) * 0.12, y); m.rotation.set(t * 2 + i, t * 3, 0); });
-  syncPool(shotMeshes, a.s.length, () => new THREE.Mesh(new THREE.OctahedronGeometry(0.28, 0), new THREE.MeshBasicMaterial({ color: 0xffd166 })));
-  a.s.forEach(([x, y], i) => { const m = shotMeshes[i]; m.position.set(x, 0.9, y); m.rotation.y = t * 10; });
-  // events up to now
+  // walls, rocks, projectiles
+  syncPool(wallMeshes, a.w.length, () => { const m = new THREE.Mesh(new THREE.BoxGeometry(1, 1.8, 0.45, 6, 2, 1), new THREE.MeshStandardMaterial({ color: 0xa88a62, flatShading: true, roughness: 1 })); m.castShadow = true; m.receiveShadow = true; return m; });
+  a.w.forEach(([x1, y1, x2, y2], i) => { const m = wallMeshes[i]; m.scale.x = Math.hypot(x2 - x1, y2 - y1); m.position.set((x1 + x2) / 2, 0.9, (y1 + y2) / 2); m.rotation.y = -Math.atan2(y2 - y1, x2 - x1); });
+  syncPool(rockMeshes, a.r.length, () => { const m = new THREE.Mesh(new THREE.DodecahedronGeometry(0.42, 0), new THREE.MeshStandardMaterial({ color: 0x9b7653, flatShading: true, emissive: 0x2a1406 })); m.castShadow = true; return m; });
+  a.r.forEach(([x, y], i) => { const m = rockMeshes[i]; m.position.set(x, 0.9 + Math.sin(t * 5 + i) * 0.15, y); m.rotation.set(t * 2 + i, t * 3, 0); });
+  syncPool(shotMeshes, a.s.length, () => new THREE.Mesh(new THREE.OctahedronGeometry(0.25, 0), new THREE.MeshBasicMaterial({ color: 0xffe08a })));
+  a.s.forEach(([x, y], i) => { const m = shotMeshes[i]; m.position.set(x, 1.0, y); m.rotation.set(t * 12, t * 10, 0); m.scale.setScalar(1.3); });
+  // events since the last frame
   const E = replay.events;
   while (evIdx < E.length && E[evIdx].t <= t) {
-    const e = E[evIdx++], g = units[e.dst] || units[e.src];
-    if (e.type === "hit" && g) { spawnFx(g.position, 0xffffff, e.knockback > 12); if (e.knockback > 12) pushFeed(`${short(e.src)} → ${short(e.dst)} · ${e.ability}`); }
-    if (e.type === "ko") { pushFeed(`KO: ${short(e.src)}${e.by ? " (by " + short(e.by) + ")" : ""}`, true); }
+    const e = E[evIdx++], f = fighters[e.dst] || fighters[e.src];
+    if (e.type === "hit" && f) {
+      const kb = e.knockback || 0;
+      burst(f.root.position, kb > 12 ? 0xffd166 : 0xffffff, kb > 12 ? 14 : 6, kb);
+      shake = Math.max(shake, Math.min(0.6, kb / 40));
+      if (kb > 12) pushFeed(`${short(e.src)} → ${short(e.dst)} · ${e.ability}`);
+    }
+    if (e.type === "ko") { pushFeed(`KO: ${short(e.src)}${e.by ? " (by " + short(e.by) + ")" : ""}`, true); shake = 0.8; koflash.style.transition = "none"; koflash.style.opacity = 1; requestAnimationFrame(() => { koflash.style.transition = "opacity .9s"; koflash.style.opacity = 0; }); }
     if (e.type === "wall") pushFeed(`${short(e.src)} raises a wall`);
-    if (e.type === "channel_release") { const u = units[e.src]; if (u) spawnFx(u.position, 0xffd166, true); pushFeed(`${short(e.src)} · ${e.ability} at ${Math.round(e.power * 100)}% power`); }
+    if (e.type === "channel_release") { const u = fighters[e.src]; if (u) { burst(u.root.position, 0xffd166, 22, 25); shake = 0.7; } pushFeed(`${short(e.src)} · ${e.ability} at ${Math.round(e.power * 100)}% power`); }
     if (e.type === "wall_block") pushFeed(`a wall saved ${short(e.src)} from a ring-out`);
+    if (e.type === "land") { const u = fighters[e.src]; if (u) burst(u.root.position, 0xc9b79c, 6, 4); }
   }
-  fx = fx.filter(m => { m.userData.age += dt; const s = 1 + m.userData.age * (m.userData.big ? 14 : 7); m.scale.setScalar(s); m.material.opacity = Math.max(0, 1 - m.userData.age * 2.2); if (m.material.opacity <= 0) { world.remove(m); return false; } return true; });
-  // slow orbiting camera that leans toward the action
-  const ang = t * 0.12, Rr = replay.radius;
-  const live = Object.values(units).filter(g => g.position.y > -1);
-  const c = live.reduce((s, g) => s.add(g.position), new THREE.Vector3()).multiplyScalar(1 / Math.max(1, live.length));
-  const spread = live.reduce((m, g) => Math.max(m, g.position.distanceTo(c)), 0);
-  const dist = THREE.MathUtils.clamp(spread * 1.6 + 9, 10, Rr * 1.5);
-  target.lerp(new THREE.Vector3(c.x * 0.7, 0, c.z * 0.7), 0.06);
-  camera.position.lerp(new THREE.Vector3(target.x + Math.sin(ang) * dist, dist * 0.75, target.z + Math.cos(ang) * dist), 0.05);
+  fx = fx.filter(m => { m.userData.age += sdt; m.scale.setScalar(1 + m.userData.age * m.userData.grow * 2); m.material.opacity = Math.max(0, 1 - m.userData.age * 2.4); if (m.material.opacity <= 0) { world.remove(m); return false; } return true; });
+  debris = debris.filter(m => { const d = m.userData; d.age += sdt; d.v.y -= 14 * sdt; m.position.addScaledVector(d.v, sdt); m.rotation.x += sdt * 9; m.material.opacity = Math.max(0, 1 - d.age * 1.6);
+    if (m.position.y < 0.05 && Math.hypot(m.position.x, m.position.z) < replay.radius) { m.position.y = 0.05; d.v.y *= -0.3; d.v.x *= 0.6; d.v.z *= 0.6; }
+    if (d.age > 0.7) { world.remove(m); return false; } return true; });
+  backdrop.children.forEach(c => { if (c.userData.bob !== undefined) c.position.y += Math.sin(t * 0.6 + c.userData.bob) * 0.004; });
+  // camera: follow the fighters, slow orbit, zoom in during slow motion, shake on impacts
+  const live = Object.values(fighters).filter(f => f.root.position.y > -1);
+  const c = live.reduce((s, f) => s.add(f.root.position), new THREE.Vector3()).multiplyScalar(1 / Math.max(1, live.length));
+  const spread = live.reduce((m, f) => Math.max(m, f.root.position.distanceTo(c)), 0);
+  const slow = slowAt(t) < 1;
+  const dist = THREE.MathUtils.clamp(spread * 1.5 + (slow ? 6 : 9), 8, replay.radius * 1.45);
+  const ang = t * 0.1 + 0.6;
+  target.lerp(new THREE.Vector3(c.x * 0.75, 0.6, c.z * 0.75), 0.08);
+  camera.position.lerp(new THREE.Vector3(target.x + Math.sin(ang) * dist, dist * 0.62 + 1.5, target.z + Math.cos(ang) * dist), 0.07);
+  shake = Math.max(0, shake - sdt * 1.8);
+  camera.position.x += (Math.random() - 0.5) * shake * 0.5; camera.position.y += (Math.random() - 0.5) * shake * 0.5;
   camera.lookAt(target);
-  { const sc = document.getElementById("scrub"); sc.value = Math.round(t / replay.duration * sc.max); }
-  document.getElementById("time").textContent = `${t.toFixed(1)}s / ${replay.duration.toFixed(0)}s`;
+  const sc = document.getElementById("scrub"); sc.value = Math.round(t / replay.duration * sc.max);
+  document.getElementById("time").textContent = `${t.toFixed(1)}s / ${replay.duration.toFixed(0)}s${slow ? "  · slow-mo" : ""}`;
 }
+
+// external control (used to record the README video deterministically)
+window.__seek = time => { if (time < t) { build(+pick.value); } t = time; };
+window.__pause = () => { playing = false; document.getElementById("play").textContent = "Play"; };
 
 // ---------- ui ----------
 const pick = document.getElementById("pick");
 R.forEach((r, i) => pick.insertAdjacentHTML("beforeend", `<option value="${i}">${r.title}</option>`));
 pick.onchange = () => build(+pick.value);
-document.getElementById("play").onclick = e => { if (done) { t = 0; evIdx = 0; done = false; banner.style.display = "none"; } playing = !playing || done; e.target.textContent = playing ? "Pause" : "Play"; };
+document.getElementById("play").onclick = e => { if (done) { build(+pick.value); playing = true; } else playing = !playing; e.target.textContent = playing ? "Pause" : "Play"; };
 document.getElementById("speed").onchange = e => speed = +e.target.value;
-document.getElementById("scrub").oninput = e => { t = e.target.value / e.target.max * replay.duration; evIdx = replay.events.findIndex(x => x.t > t); if (evIdx < 0) evIdx = replay.events.length; done = false; banner.style.display = "none"; };
-const resize = () => { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); };
+document.getElementById("scrub").oninput = e => { const nt = e.target.value / e.target.max * replay.duration; if (nt < t) build(+pick.value); t = nt; prevT = nt; evIdx = replay.events.findIndex(x => x.t > nt); if (evIdx < 0) evIdx = replay.events.length; };
+const resize = () => { renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); bloom.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); };
 addEventListener("resize", resize); resize();
+
 const params = new URLSearchParams(location.search);
-build(+(params.get("fight") || 0)); pick.value = params.get("fight") || 0;
+const start = () => { pick.value = params.get("fight") || 0; build(+pick.value); window.__ready = true; };
+new GLTFLoader().load(MODEL, g => { gltf = g; start(); }, undefined, () => start());
 let last = performance.now();
-renderer.setAnimationLoop(now => { const dt = Math.min(0.05, (now - last) / 1000); last = now; render(dt); renderer.render(scene, camera); });
+renderer.setAnimationLoop(now => {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (replay && playing && !done && !window.__recording) t = Math.min(replay.duration, t + dt * speed * slowAt(t));
+  update(); composer.render();
+});
 </script>
 </body>
 </html>
